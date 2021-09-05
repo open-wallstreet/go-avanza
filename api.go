@@ -13,6 +13,9 @@ const MaxInactiveMinutes = 24
 const layoutISO = "2006-01-02"
 
 type AvanzaApi interface {
+	PlaceOrder(*OrderOptions) (*OrderActionResponse, error)
+	EditOrder(instrumentType Instrument, orderId string, options *OrderOptions) (*OrderActionResponse, error)
+	DeleteOrder(accountId string, orderId string) (*OrderActionResponse, error)
 	GetPositions() (*Positions, error)
 	GetOverview() (*Overview, error)
 	GetAccountOverview(accountId string) (*AccountOverview, error)

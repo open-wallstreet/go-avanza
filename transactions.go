@@ -46,7 +46,6 @@ func (a *api) GetTransactions(accountOrTransactionType string, options Transacti
 	if err != nil {
 		return nil, err
 	}
-	a.logger.Info(body)
 	var transactions Transactions
 	if err := json.Unmarshal([]byte(body), &transactions); err != nil {
 		return nil, err

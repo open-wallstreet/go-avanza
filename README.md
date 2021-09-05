@@ -34,9 +34,9 @@ Here are the steps to get your TOTP Secret:
 - [ ] GetOrderbooks
 - [ ] GetInspirationLists
 - [ ] GetInspirationList
-- [ ] GetOrder
-- [ ] EditOrder
-- [ ] DeleteOrder
+- [x] GetOrder
+- [x] EditOrder
+- [x] DeleteOrder
 - [ ] Websocket RealTime data
 
 ### Shoutouts

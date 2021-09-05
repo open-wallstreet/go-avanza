@@ -9,9 +9,6 @@ import (
 )
 
 func (a *api) Search(query string, instrumentType Instrument) (*Search, error) {
-	if !a.IsAuthenticated {
-		return nil, fmt.Errorf("not authenticated")
-	}
 	path := "/_mobile/market/search/%s"
 	if instrumentType != ANY {
 		path = fmt.Sprintf(path, instrumentType)

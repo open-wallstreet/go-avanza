@@ -16,10 +16,11 @@ type ErrorMessage struct {
 	} `json:"additional"`
 }
 
-type PlaceOrder struct {
-	RequestId string `json:"requestId"`
-	Status    string `json:"status"`
-	OrderId   string `json:"orderId"`
+type OrderActionResponse struct {
+	Status    string   `json:"status"`
+	Messages  []string `json:"messages"`
+	OrderID   string   `json:"orderId"`
+	RequestID string   `json:"requestId"`
 }
 
 type TOTPAuthentication struct {
