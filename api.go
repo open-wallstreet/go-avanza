@@ -13,6 +13,7 @@ const MaxInactiveMinutes = 24
 const layoutISO = "2006-01-02"
 
 type AvanzaApi interface {
+	SubscribeOrders(ids []string) error
 	Listen() error
 	PlaceOrder(*OrderOptions) (*OrderActionResponse, error)
 	EditOrder(instrumentType Instrument, orderId string, options *OrderOptions) (*OrderActionResponse, error)
@@ -42,6 +43,9 @@ type api struct {
 func (a *api) Close() {
 	if a.reAuthenticateTimer != nil {
 		a.reAuthenticateTimer.Stop()
+	}
+	if a.websocketConnection.socket != nil {
+		a.websocketConnection.socket.Close()
 	}
 }
 
