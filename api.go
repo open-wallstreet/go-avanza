@@ -13,6 +13,7 @@ const MaxInactiveMinutes = 24
 const layoutISO = "2006-01-02"
 
 type AvanzaApi interface {
+	Listen() error
 	PlaceOrder(*OrderOptions) (*OrderActionResponse, error)
 	EditOrder(instrumentType Instrument, orderId string, options *OrderOptions) (*OrderActionResponse, error)
 	DeleteOrder(accountId string, orderId string) (*OrderActionResponse, error)
@@ -35,6 +36,7 @@ type api struct {
 	totpSession         TOTPAuthentication
 	reAuthenticateTimer *time.Timer
 	logger              *zap.SugaredLogger
+	websocketConnection *websocketConnection
 }
 
 func (a *api) Close() {
@@ -61,5 +63,8 @@ func NewApi(logger *zap.SugaredLogger) AvanzaApi {
 		totpSecret: totpSecret,
 		username:   username,
 		password:   password,
+		websocketConnection: &websocketConnection{
+			socketMessageCount: 1,
+		},
 	}
 }

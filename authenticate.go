@@ -61,7 +61,7 @@ func (a *api) authenticateTotp(transactionId string) (TOTPAuthentication, error)
 	a.IsAuthenticated = true
 	a.xSecurityToken = response.Header.Get("x-securitytoken")
 	a.totpSession = totpResponse
-
+	a.websocketConnection.pushSubscriptionId = totpResponse.PushSubscriptionId
 	a.reAuthenticateTimer = time.AfterFunc((MaxInactiveMinutes-1)*time.Minute, a.reAuthenticate)
 
 	return totpResponse, nil
