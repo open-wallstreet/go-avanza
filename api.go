@@ -12,23 +12,7 @@ const UserAgent = "Avanza API client"
 const MaxInactiveMinutes = 24
 const layoutISO = "2006-01-02"
 
-type AvanzaApi interface {
-	SubscribeOrders(ids []string) error
-	Listen() error
-	PlaceOrder(*OrderOptions) (*OrderActionResponse, error)
-	EditOrder(instrumentType Instrument, orderId string, options *OrderOptions) (*OrderActionResponse, error)
-	DeleteOrder(accountId string, orderId string) (*OrderActionResponse, error)
-	GetPositions() (*Positions, error)
-	GetOverview() (*Overview, error)
-	GetAccountOverview(accountId string) (*AccountOverview, error)
-	GetDealsAndOrders() (*DealsAndOrders, error)
-	GetTransactions(accountOrTransactionType string, options TransactionOptions) (*Transactions, error)
-	Search(query string, instrumentType Instrument) (*Search, error)
-	Authenticate() error
-	Close()
-}
-
-type api struct {
+type Client struct {
 	username            string
 	password            string
 	totpSecret          string
@@ -37,19 +21,20 @@ type api struct {
 	totpSession         TOTPAuthentication
 	reAuthenticateTimer *time.Timer
 	logger              *zap.SugaredLogger
-	websocketConnection *websocketConnection
+	pushSubscriptionId  string
 }
 
-func (a *api) Close() {
+func (a *Client) Close() {
 	if a.reAuthenticateTimer != nil {
 		a.reAuthenticateTimer.Stop()
 	}
-	if a.websocketConnection.socket != nil {
-		a.websocketConnection.socket.Close()
-	}
 }
 
-func NewApi(logger *zap.SugaredLogger) AvanzaApi {
+func (a *Client) PushSubscriptionId() string {
+	return a.pushSubscriptionId
+}
+
+func NewClient(logger *zap.SugaredLogger) *Client {
 	totpSecret := os.Getenv("AVANZA_TOTP_SECRET")
 	if totpSecret == "" {
 		logger.Fatalf("AVANZA_TOTP_SECRET environment variable not set")
@@ -62,13 +47,10 @@ func NewApi(logger *zap.SugaredLogger) AvanzaApi {
 	if password == "" {
 		logger.Fatalf("AVANZA_PASSWORD environment variable not set")
 	}
-	return &api{
+	return &Client{
 		logger:     logger,
 		totpSecret: totpSecret,
 		username:   username,
 		password:   password,
-		websocketConnection: &websocketConnection{
-			socketMessageCount: 1,
-		},
 	}
 }

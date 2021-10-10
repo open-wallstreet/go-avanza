@@ -7,7 +7,7 @@ import (
 	"github.com/monaco-io/request"
 )
 
-func (a *api) GetDealsAndOrders() (*DealsAndOrders, error) {
+func (a *Client) GetDealsAndOrders() (*DealsAndOrders, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}

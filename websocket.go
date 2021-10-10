@@ -10,16 +10,26 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/sacOO7/gowebsocket"
+	"go.uber.org/zap"
 )
 
 const SocketUrl string = "wss://www.avanza.se/_push/cometd"
 
-type websocketConnection struct {
+type AvanzaWebsocket struct {
+	client             *Client
+	logger             *zap.SugaredLogger
 	clientId           string
 	socketConnected    bool
-	pushSubscriptionId string
 	socketMessageCount int
 	socket             *gowebsocket.Socket
+	options            *AvanzaWebsocketOptions
+	subscriptions      map[string]string
+}
+
+type AvanzaWebsocketOptions struct {
+	OnError      func(error)
+	OnConnected  func()
+	OnDisconnect func(error)
 }
 
 type SocketMessage struct {
@@ -43,29 +53,20 @@ func StringPtr(s string) *string {
 	return &s
 }
 
-func (a *api) Listen() error {
+func (ws *AvanzaWebsocket) Listen() error {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
 	socket := gowebsocket.New(SocketUrl)
-	/*socket.ConnectionOptions = gowebsocket.ConnectionOptions{
-		//Proxy: gowebsocket.BuildProxy("http://example.com"),
-		UseSSL:         false,
-		UseCompression: false,
-		Subprotocols:   []string{"chat", "superchat"},
-	}*/
-	a.websocketConnection.socket = &socket
 
-	/*socket.RequestHeader.Set("Accept-Encoding", "gzip, deflate, sdch")
-	socket.RequestHeader.Set("Accept-Language", "en-US,en;q=0.8")
-	socket.RequestHeader.Set("Pragma", "no-cache")
-	socket.RequestHeader.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36")
-	*/
+	ws.socket = &socket
+
 	socket.OnConnectError = func(err error, socket gowebsocket.Socket) {
-		log.Fatal("Recieved connect error ", err)
+		if ws.options.OnError != nil {
+			ws.options.OnError(err)
+		}
 	}
 	socket.OnConnected = func(socket gowebsocket.Socket) {
-		log.Println("Connected to server")
 		bin, _ := json.Marshal([]SocketMessage{{
 			Advice: &struct {
 				Timeout  int "json:\"timeout\""
@@ -78,45 +79,47 @@ func (a *api) Listen() error {
 			Ext: &struct {
 				SubscriptionId *string "json:\"subscriptionId\""
 			}{
-				SubscriptionId: &a.websocketConnection.pushSubscriptionId,
+				SubscriptionId: StringPtr(ws.client.PushSubscriptionId()),
 			},
-			ID:                       &a.websocketConnection.socketMessageCount,
+			ID:                       &ws.socketMessageCount,
 			MinimumVersion:           StringPtr("1.0"),
 			SupportedConnectionTypes: []*string{StringPtr("websocket"), StringPtr("long-polling"), StringPtr("callback-polling")},
 			Version:                  StringPtr("1.0"),
 		}})
-		a.sendSocketMessage(bin)
+		ws.sendSocketMessage(bin)
+		if ws.options.OnConnected != nil {
+			ws.options.OnConnected()
+		}
 	}
 	socket.OnTextMessage = func(message string, socket gowebsocket.Socket) {
-		log.Println("Recieved message  " + message)
 		var anyJson []map[string]interface{}
 		b := []byte(message)
 		err := json.Unmarshal(b, &anyJson)
 		if err != nil {
-			a.logger.Error(err)
+			ws.logger.Error(err)
 		}
 		for _, message := range anyJson {
 			channel := message["channel"].(string)
-			a.logger.Infof("channel: %s", message["channel"].(string))
 			switch channel {
 			case "/meta/handshake":
-				a.handleHandshakeMessage(message)
-				break
+				ws.handleHandshakeMessage(message)
 			case "/meta/connect":
-				a.handleConnectMessage(message)
-				a.SubscribeOrders([]string{"*"})
-				break
+				ws.handleConnectMessage(message)
+			case "/meta/subscribe":
+				ws.onSubscribeMessage(message)
+			case "/meta/unsubscribe":
+				ws.onUnsubscribeMessage(message)
+			default:
+				ws.logger.Warn("got unhandled channel message %s", message["channel"].(string))
 			}
 
 		}
 
 	}
-	socket.OnPingReceived = func(data string, socket gowebsocket.Socket) {
-		log.Println("Recieved ping " + data)
-	}
 	socket.OnDisconnected = func(err error, socket gowebsocket.Socket) {
-		a.logger.Infof("Disconnected from server %v", err)
-
+		if ws.options.OnDisconnect != nil {
+			ws.options.OnDisconnect(err)
+		}
 	}
 	socket.Connect()
 
@@ -130,47 +133,75 @@ func (a *api) Listen() error {
 	}
 }
 
-func (a *api) sendSocketMessage(data []byte) error {
-	a.logger.Infof(fmt.Sprintf("sending %s", data))
-	a.websocketConnection.socket.SendText(string(data))
-	a.websocketConnection.socketMessageCount += 1
+func (ws *AvanzaWebsocket) onUnsubscribeMessage(message map[string]interface{}) {
+	var subscription SubscriptionEvent
+	err := mapstructure.Decode(message, &subscription)
+	if err != nil {
+		ws.logger.Errorf("failed to decode: %v", err)
+	}
+	if subscription.Successful {
+		delete(ws.subscriptions, subscription.Subscription)
+	}
+}
+func (ws *AvanzaWebsocket) onSubscribeMessage(message map[string]interface{}) {
+	var subscription SubscriptionEvent
+	err := mapstructure.Decode(message, &subscription)
+	if err != nil {
+		ws.logger.Errorf("failed to decode: %v", err)
+	}
+	if subscription.Successful {
+		ws.subscriptions[subscription.Subscription] = ws.clientId
+	}
+}
+
+func (ws *AvanzaWebsocket) sendSocketMessage(data []byte) error {
+	ws.socket.SendText(string(data))
+	ws.socketMessageCount += 1
 	return nil
 }
 
-func (a *api) handleHandshakeMessage(message map[string]interface{}) {
+func (ws *AvanzaWebsocket) handleHandshakeMessage(message map[string]interface{}) {
 	var handshake HandshakeEvent
 	err := mapstructure.Decode(message, &handshake)
 	if err != nil {
-		a.logger.Errorf("failed to decode: %v", err)
+		ws.logger.Errorf("failed to decode: %v", err)
 	}
-	a.websocketConnection.clientId = handshake.ClientID
+	ws.clientId = handshake.ClientID
 	if handshake.Successful {
 		bin, _ := json.Marshal([]ConnectMessage{{
 			Advice: ConnectMessageAdvice{
 				Timeout: 0,
 			},
 			Channel:        "/meta/connect",
-			ClientId:       a.websocketConnection.clientId,
+			ClientId:       ws.clientId,
 			ConnectionType: "websocket",
-			ID:             a.websocketConnection.socketMessageCount,
+			ID:             ws.socketMessageCount,
 		}})
-		a.sendSocketMessage(bin)
+		ws.sendSocketMessage(bin)
 	} else {
-		a.logger.Errorf("failed to connect to websocket %v", err)
+		ws.logger.Errorf("failed to connect to websocket %v", err)
 	}
 }
-func (a *api) handleConnectMessage(message map[string]interface{}) {
+func (ws *AvanzaWebsocket) handleConnectMessage(message map[string]interface{}) {
 	var msg ConnectEvent
-	a.logger.Info(message)
+	// ws.logger.Info(message)
 	err := mapstructure.Decode(message, &msg)
 	if err != nil {
-		a.logger.Errorf("failed to decode: %v", err)
+		ws.logger.Errorf("failed to decode: %v", err)
 	}
-	a.logger.Info(msg)
+	if msg.Successful {
+		subscriptionIds := make([]string, 0, len(ws.subscriptions))
+		for key, v := range ws.subscriptions {
+			if v != ws.clientId {
+				subscriptionIds = append(subscriptionIds, key)
+			}
+		}
+		ws.Subscribe(subscriptionIds)
+	}
 }
 
-func (a *api) SubscribeOrders(ids []string) error {
-	if len(a.websocketConnection.pushSubscriptionId) == 0 {
+func (ws *AvanzaWebsocket) Subscribe(ids []string) error {
+	if len(ws.client.PushSubscriptionId()) == 0 {
 		return fmt.Errorf("need to be authenticated to subscribe to socket")
 	}
 	idString := strings.Join(ids, ",")
@@ -180,9 +211,43 @@ func (a *api) SubscribeOrders(ids []string) error {
 	bin, _ := json.Marshal([]OrderSubscribeMessage{{
 		Subscription: subscribeString,
 		Channel:      "/meta/subscribe",
-		ClientID:     a.websocketConnection.clientId,
-		ID:           a.websocketConnection.socketMessageCount,
+		ClientID:     ws.clientId,
+		ID:           ws.socketMessageCount,
 	}})
-	a.sendSocketMessage(bin)
+	ws.sendSocketMessage(bin)
 	return nil
+}
+
+func (ws *AvanzaWebsocket) Unsubscribe(ids []string) error {
+	if len(ws.client.PushSubscriptionId()) == 0 {
+		return fmt.Errorf("need to be authenticated to subscribe to socket")
+	}
+	idString := strings.Join(ids, ",")
+
+	subscribeString := fmt.Sprintf("/orders/%s", idString)
+
+	bin, _ := json.Marshal([]OrderSubscribeMessage{{
+		Subscription: subscribeString,
+		Channel:      "/meta/unsubscribe",
+		ClientID:     ws.clientId,
+		ID:           ws.socketMessageCount,
+	}})
+	ws.sendSocketMessage(bin)
+	return nil
+}
+
+func NewAvanzaWebsocketOptions() *AvanzaWebsocketOptions {
+	return &AvanzaWebsocketOptions{
+		OnError: func(e error) {},
+	}
+}
+
+func NewWebsocket(client *Client, logger *zap.SugaredLogger, options *AvanzaWebsocketOptions) *AvanzaWebsocket {
+	return &AvanzaWebsocket{
+		socketMessageCount: 1,
+		client:             client,
+		logger:             logger,
+		options:            options,
+		subscriptions:      make(map[string]string),
+	}
 }

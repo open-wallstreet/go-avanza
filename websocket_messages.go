@@ -15,6 +15,13 @@ type HandshakeEvent struct {
 	Successful bool   `json:"successful"`
 }
 
+type SubscriptionEvent struct {
+	Channel      string `json:"channel"`
+	ID           string `json:"id"`
+	Subscription string `json:"subscription"`
+	Successful   bool   `json:"successful"`
+}
+
 type ConnectMessageAdvice struct {
 	Timeout int `json:"timeout"`
 }

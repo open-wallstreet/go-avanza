@@ -12,7 +12,7 @@ type RequestOptions struct {
 	query   map[string]string
 }
 
-func (a *api) request(path string, method string, data map[string]interface{}, config RequestOptions) (string, *http.Response, error) {
+func (a *Client) request(path string, method string, data map[string]interface{}, config RequestOptions) (string, *http.Response, error) {
 	headers := map[string]string{
 		"Accept":                  "*/*",
 		"Content-Type":            "application/json",

@@ -8,7 +8,7 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
-func (a *api) Authenticate() error {
+func (a *Client) Authenticate() error {
 	data := map[string]interface{}{
 		"username":           a.username,
 		"password":           a.password,
@@ -34,7 +34,7 @@ func (a *api) Authenticate() error {
 	return nil
 }
 
-func (a *api) authenticateTotp(transactionId string) (TOTPAuthentication, error) {
+func (a *Client) authenticateTotp(transactionId string) (TOTPAuthentication, error) {
 	totpCode, err := totp.GenerateCode(a.totpSecret, time.Now())
 	if err != nil {
 		a.logger.Error(err)
@@ -61,13 +61,13 @@ func (a *api) authenticateTotp(transactionId string) (TOTPAuthentication, error)
 	a.IsAuthenticated = true
 	a.xSecurityToken = response.Header.Get("x-securitytoken")
 	a.totpSession = totpResponse
-	a.websocketConnection.pushSubscriptionId = totpResponse.PushSubscriptionId
+	a.pushSubscriptionId = totpResponse.PushSubscriptionId
 	a.reAuthenticateTimer = time.AfterFunc((MaxInactiveMinutes-1)*time.Minute, a.reAuthenticate)
 
 	return totpResponse, nil
 }
 
-func (a *api) reAuthenticate() {
+func (a *Client) reAuthenticate() {
 	a.logger.Debug("reAuthenticate to avanza")
 	a.Authenticate()
 }

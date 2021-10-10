@@ -38,6 +38,8 @@ Here are the steps to get your TOTP Secret:
 - [x] EditOrder
 - [x] DeleteOrder
 - [ ] Websocket RealTime data
+  - [x] Orders
+  - [ ] Quotes
 
 ### Shoutouts
 
