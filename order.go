@@ -15,7 +15,7 @@ type OrderOptions struct {
 	Volume      int
 }
 
-func (a *api) PlaceOrder(options *OrderOptions) (*OrderActionResponse, error) {
+func (a *Client) PlaceOrder(options *OrderOptions) (*OrderActionResponse, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
@@ -45,7 +45,7 @@ func (a *api) PlaceOrder(options *OrderOptions) (*OrderActionResponse, error) {
 	return &placeOrder, nil
 }
 
-func (a *api) EditOrder(instrumentType Instrument, orderId string, options *OrderOptions) (*OrderActionResponse, error) {
+func (a *Client) EditOrder(instrumentType Instrument, orderId string, options *OrderOptions) (*OrderActionResponse, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
@@ -76,7 +76,7 @@ func (a *api) EditOrder(instrumentType Instrument, orderId string, options *Orde
 	return &placeOrder, nil
 }
 
-func (a *api) DeleteOrder(accountId string, orderId string) (*OrderActionResponse, error) {
+func (a *Client) DeleteOrder(accountId string, orderId string) (*OrderActionResponse, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}

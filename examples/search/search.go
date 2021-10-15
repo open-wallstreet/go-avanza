@@ -10,7 +10,7 @@ func main() {
 	godotenv.Load()
 	log, _ := zap.NewDevelopment()
 	logger := log.Sugar()
-	api := goavanza.NewApi(logger)
+	api := goavanza.NewClient(logger)
 
 	search, err := api.Search("novotek", goavanza.STOCK)
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"github.com/monaco-io/request"
 )
 
-func (a *api) GetPositions() (*Positions, error) {
+func (a *Client) GetPositions() (*Positions, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}

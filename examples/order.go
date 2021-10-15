@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -13,19 +14,16 @@ func main() {
 	godotenv.Load()
 	log, _ := zap.NewDevelopment()
 	logger := log.Sugar()
-	api := goavanza.NewApi(logger)
+	api := goavanza.NewClient(logger)
 
 	err := api.Authenticate()
 	if err != nil {
 		logger.Panic(err)
 	}
 
-	overview, err := api.GetOverview()
-	if err != nil {
-		panic(err)
-	}
+	websocketApi := goavanza.NewWebsocket(api, logger, goavanza.NewAvanzaWebsocketOptions())
 
-	logger.Info(overview)
+	go websocketApi.Listen()
 
 	logger.Infof("account id %s", os.Getenv("AVANZA_ACCOUNT_ID"))
 
@@ -45,8 +43,25 @@ func main() {
 	}
 	logger.Info(res)
 
-	options.Price = 62
+	websocketApi.Subscribe([]string{res.OrderID})
 
-	api.EditOrder(goavanza.STOCK, res.OrderID, options)
-	api.DeleteOrder(os.Getenv("AVANZA_ACCOUNT_ID"), res.OrderID)
+	options.Price = 62
+	websocketApi.Unsubscribe([]string{res.OrderID})
+
+	// api.EditOrder(goavanza.STOCK, res.OrderID, options)
+
+	// time.Sleep(5 * time.Second)
+
+	// api.DeleteOrder(os.Getenv("AVANZA_ACCOUNT_ID"), res.OrderID)
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
+	for {
+		select {
+		case <-interrupt:
+			logger.Info("interrupt")
+			api.Close()
+			return
+		}
+	}
 }

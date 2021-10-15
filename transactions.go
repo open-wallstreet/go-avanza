@@ -17,7 +17,7 @@ type TransactionOptions struct {
 	OrderBookIDs []string
 }
 
-func (a *api) GetTransactions(accountOrTransactionType string, options TransactionOptions) (*Transactions, error) {
+func (a *Client) GetTransactions(accountOrTransactionType string, options TransactionOptions) (*Transactions, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}

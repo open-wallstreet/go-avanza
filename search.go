@@ -8,7 +8,7 @@ import (
 	"github.com/monaco-io/request"
 )
 
-func (a *api) Search(query string, instrumentType Instrument) (*Search, error) {
+func (a *Client) Search(query string, instrumentType Instrument) (*Search, error) {
 	path := "/_mobile/market/search/%s"
 	if instrumentType != ANY {
 		path = fmt.Sprintf(path, instrumentType)

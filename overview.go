@@ -7,7 +7,7 @@ import (
 	"github.com/monaco-io/request"
 )
 
-func (a *api) GetOverview() (*Overview, error) {
+func (a *Client) GetOverview() (*Overview, error) {
 	if !a.IsAuthenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
