@@ -27,10 +27,11 @@ type AvanzaWebsocket struct {
 }
 
 type AvanzaWebsocketOptions struct {
-	OnError      func(error)
-	OnConnected  func()
-	OnDisconnect func(error)
-	OnQuote      func(QuoteMessage)
+	OnError              func(error)
+	OnConnected          func()
+	OnDisconnect         func(error)
+	OnQuote              func(QuoteMessage)
+	OnOrderDepthsMessage func(OrderDepthsMessage)
 }
 
 type SocketMessage struct {
@@ -115,6 +116,8 @@ func (ws *AvanzaWebsocket) Listen() error {
 				switch {
 				case strings.HasPrefix(channel, "/quotes/"):
 					ws.onQuotesMessage(message)
+				case strings.HasPrefix(channel, "/orderdepths/"):
+					ws.onOrderDepthsMessage(message)
 				default:
 					ws.logger.Warn("got unhandled channel message %s", message["channel"].(string))
 				}
@@ -148,6 +151,17 @@ func (ws *AvanzaWebsocket) onUnsubscribeMessage(message map[string]interface{}) 
 	}
 	if subscription.Successful {
 		delete(ws.subscriptions, subscription.Subscription)
+	}
+}
+
+func (ws *AvanzaWebsocket) onOrderDepthsMessage(message map[string]interface{}) {
+	var od OrderDepthsMessage
+	err := mapstructure.Decode(message, &od)
+	if err != nil {
+		ws.logger.Errorf("failed to decode: %v", err)
+	}
+	if ws.options.OnQuote != nil {
+		ws.options.OnOrderDepthsMessage(od)
 	}
 }
 

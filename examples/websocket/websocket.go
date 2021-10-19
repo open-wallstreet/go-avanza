@@ -30,9 +30,12 @@ func main() {
 	options.OnQuote = func(quote goavanza.QuoteMessage) {
 		logger.Info(quote)
 	}
+	options.OnOrderDepthsMessage = func(od goavanza.OrderDepthsMessage) {
+		logger.Info(od)
+	}
 
 	websocketApi := goavanza.NewWebsocket(api, logger, options)
 
-	websocketApi.Subscribe([]string{"/quotes/19002"})
+	websocketApi.Subscribe([]string{"/orderdepths/549768"})
 	websocketApi.Listen()
 }

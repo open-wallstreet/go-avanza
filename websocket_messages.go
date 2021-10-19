@@ -74,3 +74,37 @@ type QuoteMessage struct {
 	} `json:"data"`
 	Channel string `json:"channel"`
 }
+
+type OrderDepthsMessage struct {
+	Data struct {
+		OrderbookID  string `json:"orderbookId"`
+		ReceivedTime string `json:"receivedTime"`
+		TotalLevel   struct {
+			BuySide struct {
+				Price         float64 `json:"price"`
+				Volume        float64 `json:"volume"`
+				VolumePercent int     `json:"volumePercent"`
+			} `json:"buySide"`
+			SellSide struct {
+				Price         float64 `json:"price"`
+				Volume        float64 `json:"volume"`
+				VolumePercent int     `json:"volumePercent"`
+			} `json:"sellSide"`
+		} `json:"totalLevel"`
+		Levels []struct {
+			BuySide struct {
+				Price         float64 `json:"price"`
+				Volume        int     `json:"volume"`
+				VolumePercent int     `json:"volumePercent"`
+			} `json:"buySide"`
+			SellSide struct {
+				Price         float64 `json:"price"`
+				Volume        int     `json:"volume"`
+				VolumePercent int     `json:"volumePercent"`
+			} `json:"sellSide"`
+		} `json:"levels"`
+		MarketMakerLevelAsk interface{} `json:"marketMakerLevelAsk"`
+		MarketMakerLevelBid interface{} `json:"marketMakerLevelBid"`
+	} `json:"data"`
+	Channel string `json:"channel"`
+}
