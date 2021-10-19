@@ -27,8 +27,12 @@ func main() {
 	options.OnDisconnect = func(e error) {
 		logger.Infof("websocket disconnected", err)
 	}
+	options.OnQuote = func(quote goavanza.QuoteMessage) {
+		logger.Info(quote)
+	}
 
 	websocketApi := goavanza.NewWebsocket(api, logger, options)
 
+	websocketApi.Subscribe([]string{"/quotes/19002"})
 	websocketApi.Listen()
 }

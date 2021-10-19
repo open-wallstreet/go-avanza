@@ -30,6 +30,7 @@ type AvanzaWebsocketOptions struct {
 	OnError      func(error)
 	OnConnected  func()
 	OnDisconnect func(error)
+	OnQuote      func(QuoteMessage)
 }
 
 type SocketMessage struct {
@@ -100,6 +101,7 @@ func (ws *AvanzaWebsocket) Listen() error {
 		}
 		for _, message := range anyJson {
 			channel := message["channel"].(string)
+			println(channel)
 			switch channel {
 			case "/meta/handshake":
 				ws.handleHandshakeMessage(message)
@@ -110,7 +112,12 @@ func (ws *AvanzaWebsocket) Listen() error {
 			case "/meta/unsubscribe":
 				ws.onUnsubscribeMessage(message)
 			default:
-				ws.logger.Warn("got unhandled channel message %s", message["channel"].(string))
+				switch {
+				case strings.HasPrefix(channel, "/quotes/"):
+					ws.onQuotesMessage(message)
+				default:
+					ws.logger.Warn("got unhandled channel message %s", message["channel"].(string))
+				}
 			}
 
 		}
@@ -143,6 +150,17 @@ func (ws *AvanzaWebsocket) onUnsubscribeMessage(message map[string]interface{}) 
 		delete(ws.subscriptions, subscription.Subscription)
 	}
 }
+
+func (ws *AvanzaWebsocket) onQuotesMessage(message map[string]interface{}) {
+	var quote QuoteMessage
+	err := mapstructure.Decode(message, &quote)
+	if err != nil {
+		ws.logger.Errorf("failed to decode: %v", err)
+	}
+	if ws.options.OnQuote != nil {
+		ws.options.OnQuote(quote)
+	}
+}
 func (ws *AvanzaWebsocket) onSubscribeMessage(message map[string]interface{}) {
 	var subscription SubscriptionEvent
 	err := mapstructure.Decode(message, &subscription)
@@ -151,10 +169,15 @@ func (ws *AvanzaWebsocket) onSubscribeMessage(message map[string]interface{}) {
 	}
 	if subscription.Successful {
 		ws.subscriptions[subscription.Subscription] = ws.clientId
+	} else {
+		ws.logger.Errorf("failed to subscribe %v", subscription)
 	}
 }
 
 func (ws *AvanzaWebsocket) sendSocketMessage(data []byte) error {
+	if ws.socket == nil {
+		return fmt.Errorf("no websocket connection has been established")
+	}
 	ws.socket.SendText(string(data))
 	ws.socketMessageCount += 1
 	return nil
@@ -192,6 +215,7 @@ func (ws *AvanzaWebsocket) handleConnectMessage(message map[string]interface{}) 
 	if msg.Successful {
 		subscriptionIds := make([]string, 0, len(ws.subscriptions))
 		for key, v := range ws.subscriptions {
+			ws.logger.Infof("sub to %s", key)
 			if v != ws.clientId {
 				subscriptionIds = append(subscriptionIds, key)
 			}
@@ -206,14 +230,15 @@ func (ws *AvanzaWebsocket) Subscribe(ids []string) error {
 	}
 	idString := strings.Join(ids, ",")
 
-	subscribeString := fmt.Sprintf("/orders/%s", idString)
-
 	bin, _ := json.Marshal([]OrderSubscribeMessage{{
-		Subscription: subscribeString,
+		Subscription: idString,
 		Channel:      "/meta/subscribe",
 		ClientID:     ws.clientId,
 		ID:           ws.socketMessageCount,
 	}})
+	for _, id := range ids {
+		ws.subscriptions[id] = ""
+	}
 	ws.sendSocketMessage(bin)
 	return nil
 }
@@ -224,10 +249,8 @@ func (ws *AvanzaWebsocket) Unsubscribe(ids []string) error {
 	}
 	idString := strings.Join(ids, ",")
 
-	subscribeString := fmt.Sprintf("/orders/%s", idString)
-
 	bin, _ := json.Marshal([]OrderSubscribeMessage{{
-		Subscription: subscribeString,
+		Subscription: idString,
 		Channel:      "/meta/unsubscribe",
 		ClientID:     ws.clientId,
 		ID:           ws.socketMessageCount,
@@ -238,7 +261,10 @@ func (ws *AvanzaWebsocket) Unsubscribe(ids []string) error {
 
 func NewAvanzaWebsocketOptions() *AvanzaWebsocketOptions {
 	return &AvanzaWebsocketOptions{
-		OnError: func(e error) {},
+		OnError:      func(e error) {},
+		OnConnected:  func() {},
+		OnDisconnect: func(e error) {},
+		OnQuote:      func(q QuoteMessage) {},
 	}
 }
 

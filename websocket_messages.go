@@ -51,3 +51,26 @@ type OrderSubscribeMessage struct {
 	Subscription string `json:"subscription"`
 	ClientID     string `json:"clientId"`
 }
+
+type QuoteMessage struct {
+	Data struct {
+		OrderbookID                string      `json:"orderbookId"`
+		BuyPrice                   interface{} `json:"buyPrice"`
+		SellPrice                  interface{} `json:"sellPrice"`
+		Spread                     interface{} `json:"spread"`
+		ClosingPrice               float64     `json:"closingPrice"`
+		HighestPrice               float64     `json:"highestPrice"`
+		LowestPrice                float64     `json:"lowestPrice"`
+		LastPrice                  float64     `json:"lastPrice"`
+		Change                     float64     `json:"change"`
+		ChangePercent              float64     `json:"changePercent"`
+		Updated                    int64       `json:"updated"`
+		VolumeWeightedAveragePrice interface{} `json:"volumeWeightedAveragePrice"`
+		TotalVolumeTraded          int         `json:"totalVolumeTraded"`
+		TotalValueTraded           float64     `json:"totalValueTraded"`
+		LastUpdated                int64       `json:"lastUpdated"`
+		ChangePercentNumber        float64     `json:"changePercentNumber"`
+		UpdatedDisplay             string      `json:"updatedDisplay"`
+	} `json:"data"`
+	Channel string `json:"channel"`
+}

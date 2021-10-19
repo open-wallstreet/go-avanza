@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -43,10 +44,10 @@ func main() {
 	}
 	logger.Info(res)
 
-	websocketApi.Subscribe([]string{res.OrderID})
+	websocketApi.Subscribe([]string{fmt.Sprintf("/orders/%s", res.OrderID)})
 
 	options.Price = 62
-	websocketApi.Unsubscribe([]string{res.OrderID})
+	websocketApi.Unsubscribe([]string{fmt.Sprintf("/orders/%s", res.OrderID)})
 
 	// api.EditOrder(goavanza.STOCK, res.OrderID, options)
 
