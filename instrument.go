@@ -1,5 +1,12 @@
 package goavanza
 
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/monaco-io/request"
+	"strings"
+)
+
 type Instrument string
 
 const (
@@ -44,4 +51,17 @@ func (e Instrument) String() string {
 	}
 
 	return ""
+}
+
+func (a *Client) GetInstrument(id string, instrument Instrument) (*InstrumentResponse, error) {
+	body, _, err := a.request(fmt.Sprintf("/_mobile/market/%s/%s", strings.ToLower(string(instrument)), id), request.GET, nil, RequestOptions{})
+	if err != nil {
+		return nil, err
+	}
+	var instrumentResponse InstrumentResponse
+	if err := json.Unmarshal([]byte(body), &instrumentResponse); err != nil {
+		return nil, err
+	}
+
+	return &instrumentResponse, nil
 }
