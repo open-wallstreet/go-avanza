@@ -30,24 +30,18 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	overview, err := client.Account.GetOverview(context.Background())
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-	log.Println(overview)
 
-	/* positions, err := client.Account.GetDealsAndOrders(context.Background())
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-	log.Println(positions) */
-	d := models.Date(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC))
-	transactions, err := client.Account.GetTransactions(context.Background(), &models.GetTransactionsParams{
-		AccountID: overview.Accounts[2].AccountId,
-		FromDate:  &d,
+	orderBook, err := client.Order.PlaceOrder(context.Background(), &models.PlaceOrderParams{
+		AccountID:   os.Getenv("AVANZA_ACCOUNT_ID"),
+		OrderBookID: "5452",
+		OrderType:   models.OrderTypeBuy,
+		Price:       65,
+		ValidUntil:  models.Date(time.Now()),
+		Volume:      1,
 	})
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	log.Println(transactions)
+	log.Println(orderBook)
+
 }

@@ -4,12 +4,16 @@ import (
 	"github.com/open-wallstreet/go-avanza/avanza/account"
 	"github.com/open-wallstreet/go-avanza/avanza/auth"
 	"github.com/open-wallstreet/go-avanza/avanza/client"
+	"github.com/open-wallstreet/go-avanza/avanza/market"
+	"github.com/open-wallstreet/go-avanza/avanza/order"
 )
 
 type AvanzaClient struct {
 	client.Client
 	Auth    *auth.AuthClient
 	Account *account.AccountClient
+	Market  *market.MarketClient
+	Order   *order.OrderClient
 }
 
 func New(opts ...func(a *AvanzaClient)) *AvanzaClient {
@@ -18,6 +22,8 @@ func New(opts ...func(a *AvanzaClient)) *AvanzaClient {
 		Client:  c,
 		Auth:    &auth.AuthClient{Client: c},
 		Account: &account.AccountClient{Client: c},
+		Market:  &market.MarketClient{Client: c},
+		Order:   &order.OrderClient{Client: c},
 	}
 	for _, o := range opts {
 		o(a)

@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	OverviewPath = "/_mobile/account/overview"
-	AccountOverviewPath = "/_mobile/account/{accountId}/overview"
-	GetPositionsPath = "/_mobile/account/positions"
+	OverviewPath          = "/_mobile/account/overview"
+	AccountOverviewPath   = "/_mobile/account/{accountId}/overview"
+	GetPositionsPath      = "/_mobile/account/positions"
 	GetDealsAndOrdersPath = "/_mobile/account/dealsandorders"
+	GetTransactionsPath   = "/_mobile/account/transactions/{accountId}"
 )
 
 type AccountClient struct {
@@ -45,5 +46,11 @@ func (a *AccountClient) GetDealsAndOrders(ctx context.Context, options ...models
 	res := &models.GetDealsAndOrdersResponse{}
 	params := &models.GetDealsAndOrdersParams{}
 	err := a.Call(ctx, http.MethodGet, GetDealsAndOrdersPath, params, res, options...)
+	return res, err
+}
+
+func (a *AccountClient) GetTransactions(ctx context.Context, params *models.GetTransactionsParams, options ...models.RequestOption) (*models.GetTransactionsResponse, error) {
+	res := &models.GetTransactionsResponse{}
+	err := a.Call(ctx, http.MethodGet, GetTransactionsPath, params, res, options...)
 	return res, err
 }

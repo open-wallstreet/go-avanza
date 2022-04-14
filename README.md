@@ -31,7 +31,7 @@ Here are the steps to get your TOTP Secret:
 - [ ] AddToWatchlist
 - [x] GetInstrument
 - [x] GetOrderbook
-- [ ] GetOrderbooks
+- [x] GetOrderbooks
 - [ ] GetInspirationLists
 - [ ] GetInspirationList
 - [x] GetOrder

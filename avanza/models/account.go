@@ -1,7 +1,48 @@
 package models
 
-type AccountOverviewParams struct {
+type GetTransactionsResponse struct {
+	Transactions              []Transaction `json:"transactions"`
+	TotalNumberOfTransactions int           `json:"totalNumberOfTransactions"`
+}
+
+type Transaction struct {
+	Account struct {
+		Type string `json:"type"`
+		Name string `json:"name"`
+		ID   string `json:"id"`
+	} `json:"account"`
+	TransactionType  string  `json:"transactionType"`
+	VerificationDate string  `json:"verificationDate"`
+	Description      string  `json:"description"`
+	Currency         string  `json:"currency"`
+	Amount           float64 `json:"amount"`
+	ID               string  `json:"id"`
+	Sum              float64 `json:"sum,omitempty"`
+	Commission       float64 `json:"commission,omitempty"`
+	NoteID           string  `json:"noteId,omitempty"`
+	CurrencyRate     float64 `json:"currencyRate,omitempty"`
+	Orderbook        struct {
+		Isin     string `json:"isin"`
+		Currency string `json:"currency"`
+		Name     string `json:"name"`
+		FlagCode string `json:"flagCode"`
+		ID       string `json:"id"`
+		Type     string `json:"type"`
+	} `json:"orderbook,omitempty"`
+	Volume float64 `json:"volume,omitempty"`
+	Price  float64 `json:"price,omitempty"`
+}
+
+type GetTransactionsParams struct {
 	AccountID string `path:"accountId" validate:"required"`
+	FromDate     *Date     `query:"from"`
+	ToDate       *Date     `query:"to"`
+	OrderBookIds *[]string `query:"orderbookId"`
+	MinAmount    *float64  `query:"minAmount"`
+	MaxAmount    *float64  `query:"maxAmount"`
+}
+type AccountOverviewParams struct {
+	AccountID    string    `path:"accountId" validate:"required"`
 }
 
 type AccountOverviewResponse struct {

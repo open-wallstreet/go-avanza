@@ -53,7 +53,7 @@ func (c *Client) CallURL(ctx context.Context, method, uri string, response, para
 	req.SetQueryParamsFromValues(options.QueryParams)
 	req.SetHeaderMultiValues(options.Headers)
 	req.SetResult(response).SetError(&models.ErrorResponse{})
-	if method == http.MethodPost {
+	if method == http.MethodPost || method == http.MethodPut {
 		req.SetBody(params)
 	}
 	res, err := req.Execute(method, uri)
