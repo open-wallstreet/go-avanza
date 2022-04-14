@@ -1,5 +1,6 @@
 package goavanza
 
+/*
 type HandshakeEvent struct {
 	MinimumVersion           string   `json:"minimumVersion"`
 	ClientID                 string   `json:"clientId"`
@@ -108,3 +109,4 @@ type OrderDepthsMessage struct {
 	} `json:"data"`
 	Channel string `json:"channel"`
 }
+*/

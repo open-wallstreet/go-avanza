@@ -6,23 +6,23 @@ import (
 	"time"
 )
 
-type Instrument string
+type InstrumentType string
 
 const (
-	AnyInstrument      Instrument = "ANY"
-	Stock              Instrument = "STOCK"
-	Fund               Instrument = "FUND"
-	Bond               Instrument = "BOND"
-	Option             Instrument = "OPTION"
-	FutureForward      Instrument = "FUTURE_FORWARD"
-	Certificate        Instrument = "CERTIFICATE"
-	Warrent            Instrument = "WARRENT"
-	ETF                Instrument = "EXCHANGE_TRADED_FUND"
-	Index              Instrument = "INDEX"
-	PremiumBond        Instrument = "PREMIUM_BOND"
-	SubscriptionOption Instrument = "SUBSCRIPTION_OPTION"
-	EquityLinkedBond   Instrument = "EQUITY_LINKED_BOND"
-	Convertible        Instrument = "CONVERTIBLE"
+	AnyInstrument      InstrumentType = "ANY"
+	Stock              InstrumentType = "STOCK"
+	Fund               InstrumentType = "FUND"
+	Bond               InstrumentType = "BOND"
+	Option             InstrumentType = "OPTION"
+	FutureForward      InstrumentType = "FUTURE_FORWARD"
+	Certificate        InstrumentType = "CERTIFICATE"
+	Warrent            InstrumentType = "WARRENT"
+	ETF                InstrumentType = "EXCHANGE_TRADED_FUND"
+	Index              InstrumentType = "INDEX"
+	PremiumBond        InstrumentType = "PREMIUM_BOND"
+	SubscriptionOption InstrumentType = "SUBSCRIPTION_OPTION"
+	EquityLinkedBond   InstrumentType = "EQUITY_LINKED_BOND"
+	Convertible        InstrumentType = "CONVERTIBLE"
 )
 
 type OrderType string

@@ -1,5 +1,5 @@
 package goavanza
-
+/*
 import (
 	"encoding/json"
 	"fmt"
@@ -291,3 +291,4 @@ func NewWebsocket(client *Client, logger *zap.SugaredLogger, options *AvanzaWebs
 		subscriptions:      make(map[string]string),
 	}
 }
+*/
