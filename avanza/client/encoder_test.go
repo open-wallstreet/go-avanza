@@ -40,7 +40,7 @@ func (suite *EncoderTestSuite) TestEncode_Params() {
 	}
 
 	expected := "/v1/2.1234/testing?float=2.1234&str=testing"
-	actual, err := New().EncodeParams(testPath, params)
+	actual, err := NewEncoder().EncodeParams(testPath, params)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), expected, actual)
 }
@@ -60,7 +60,7 @@ func (suite *EncoderTestSuite) TestEncode_Time() {
 	}
 
 	expected := "/v1/2020-01-01T00:00:00.000Z?time=2020-01-01T00%3A00%3A00.000Z"
-	actual, err := New().EncodeParams(testPath, params)
+	actual, err := NewEncoder().EncodeParams(testPath, params)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), expected, actual)
 }
@@ -80,7 +80,7 @@ func (suite *EncoderTestSuite) TestEncode_Date() {
 	}
 
 	expected := "/v1/2020-01-01?date=2020-01-01"
-	actual, err := New().EncodeParams(testPath, params)
+	actual, err := NewEncoder().EncodeParams(testPath, params)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), expected, actual)
 }
@@ -100,7 +100,7 @@ func (suite *EncoderTestSuite) TestEncode_Milliseconds() {
 	}
 
 	expected := "/v1/1626912000000?millis=1626912000000"
-	actual, err := New().EncodeParams(testPath, params)
+	actual, err := NewEncoder().EncodeParams(testPath, params)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), expected, actual)
 }
@@ -120,12 +120,12 @@ func (suite *EncoderTestSuite) TestEncode_Nanoseconds() {
 	}
 
 	expected := "/v1/1626912000000000000?nanos=1626912000000000000"
-	actual, err := New().EncodeParams(testPath, params)
+	actual, err := NewEncoder().EncodeParams(testPath, params)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), expected, actual)
 }
 
 func (suite *EncoderTestSuite) TestEncodeValidationError() {
-	_, err := New().EncodeParams("/v1/test", nil)
+	_, err := NewEncoder().EncodeParams("/v1/test", nil)
 	assert.NotNil(suite.T(), err)
 }
