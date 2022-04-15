@@ -11,7 +11,7 @@ if err != nil {
 }
 
 timeout, _ := context.WithTimeout(context.Background(), 90*time.Second)
-_, quotes, err := client.Websocket.StreamQuotes(timeout, "/quotes/19000") // 19000 = USD/SEK
+_, quotes, err := client.Websocket.StreamQuotes(timeout, "19000") // 19000 = USD/SEK
 if err != nil {
     log.Fatalf(err.Error())
 }
@@ -29,11 +29,11 @@ Here is a quick explanation how to build the subscription params string.
 
 
 
-|                    | Single                              | Multiple                                            |
-|--------------------|:------------------------------------|:----------------------------------------------------|
-| Quotes             | `/quotes/{orderbookId}`             | `/quotes/{orderbookId1},{orderbookId2}`             |
-| OrderDepth         | `/orderdepths/{orderbookId}`        | `/orderdepths/{orderbookId1},{orderbookId2}`        |
-| BrokerTradeSummary | `/brokertradesummary/{orderbookId}` | `/brokertradesummary/{orderbookId1},{orderbookId2}` |
-| Trades             | `/trades/{orderbookId}`             | `/trades/{orderbookId},{orderbookId}`               |
-| Positions          | `/positions/{accountID}`            | `/positions/{accountID1},{accountID2}`              |
-| Orders             | `/orders/{orderID}`                 | `/positions/{orderID1},{orderID2}`                  |
+|                    | Single          | Multiple                        |
+|--------------------|:----------------|:--------------------------------|
+| Quotes             | `{orderbookId}` | `{orderbookId1},{orderbookId2}` |
+| OrderDepth         | `{orderbookId}` | `{orderbookId1},{orderbookId2}` |
+| BrokerTradeSummary | `{orderbookId}` | `{orderbookId1},{orderbookId2}` |
+| Trades             | `{orderbookId}` | `{orderbookId},{orderbookId}`   |
+| Positions          | `{accountID}`   | `{accountID1},{accountID2}`     |
+| Orders             | `{orderID}`     | `{orderID1},{orderID2}`         |
