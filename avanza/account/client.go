@@ -16,7 +16,7 @@ const (
 )
 
 type AccountClient struct {
-	client.Client
+	*client.Client
 }
 
 // GetOverview retrieves overview of all accounts

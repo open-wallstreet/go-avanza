@@ -19,7 +19,7 @@ const MaxInactiveMinutes = 24
 
 // AuthClient defines a REST Client for Authentication API:s
 type AuthClient struct {
-	client.Client
+	*client.Client
 	reAuthenticateTimer *time.Timer
 	username            string
 	password            string
@@ -59,7 +59,7 @@ func (a *AuthClient) authenticateTotp(ctx context.Context, options ...models.Req
 		Method:   "TOTP",
 	}
 	err = a.Call(ctx, http.MethodPost, TOTPPath, params, res, options...)
-	a.AuthTokens = &models.AuthSessionTokens{
+	a.Client.AuthTokens = &models.AuthSessionTokens{
 		AuthenticationSession: res.AuthenticationSession,
 		PushSubscriptionId:    res.PushSubscriptionId,
 	}
