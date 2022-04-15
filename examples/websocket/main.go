@@ -30,7 +30,7 @@ func main() {
 	}
 
 	timeout, _ := context.WithTimeout(context.Background(), 90*time.Second)
-	_, quotes, err := client.Websocket.StreamQuotes(timeout, "/quotes/19000") // 19000 = USD/SEK
+	_, quotes, err := client.Websocket.StreamQuotes(timeout, "19000") // 19000 = USD/SEK
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

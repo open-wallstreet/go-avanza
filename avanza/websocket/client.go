@@ -11,8 +11,13 @@ import (
 )
 
 const (
-	DefaultWebsocketUrl = "wss://www.avanza.se/_push/cometd"
-	PingChannel         = "/meta/connect"
+	DefaultWebsocketUrl        = "wss://www.avanza.se/_push/cometd"
+	PingChannel                = "/meta/connect"
+	QuotesSubscriptionPath     = "/quotes/%s"
+	OrderDepthSubscriptionPath = "/orderdepths/%s"
+	PositionsSubscriptionPath  = "/positions/%s"
+	OrdersSubscriptionPath     = "/orders/%s"
+	TradesSubscriptionPath     = "/trades/%s"
 )
 
 type WebsocketClient struct {
@@ -54,7 +59,7 @@ func (w *WebsocketClient) dial() (*Conn, error) {
 type ChanStreamQuotes chan models.StreamQuote
 
 func (w *WebsocketClient) StreamQuotes(ctx context.Context, params string) (*Conn, ChanStreamQuotes, error) {
-	conn, err := w.Connect(params)
+	conn, err := w.Connect(fmt.Sprintf(QuotesSubscriptionPath, params))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -76,11 +81,142 @@ func (w *WebsocketClient) StreamQuotes(ctx context.Context, params string) (*Con
 					continue // ignore malformed data
 				}
 				for _, q := range quote {
-					println(q.Channel)
 					quotes <- q
 				}
 			}
 		}
 	}()
 	return conn, quotes, nil
+}
+
+type ChanStreamOrderDepth chan models.StreamOrderDepth
+
+func (w *WebsocketClient) StreamOrderDepth(ctx context.Context, params string) (*Conn, ChanStreamOrderDepth, error) {
+	conn, err := w.Connect(fmt.Sprintf(OrderDepthSubscriptionPath, params))
+	if err != nil {
+		return nil, nil, err
+	}
+	data := make(chan []byte, 10000)
+	go conn.Collect(data)
+
+	var orderDepth = make(ChanStreamOrderDepth, 10000)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				close(orderDepth)
+				return
+			case msgBytes := <-data:
+				var orderDepths []models.StreamOrderDepth
+				err := json.Unmarshal(msgBytes, &orderDepths)
+				if err != nil {
+					println("failed to unmarshal")
+					continue // ignore malformed data
+				}
+				for _, o := range orderDepths {
+					orderDepth <- o
+				}
+			}
+		}
+	}()
+	return conn, orderDepth, nil
+}
+
+type ChanStreamPositions chan models.StreamPositions
+
+func (w *WebsocketClient) StreamPositions(ctx context.Context, params string) (*Conn, ChanStreamPositions, error) {
+	conn, err := w.Connect(fmt.Sprintf(PositionsSubscriptionPath, params))
+	if err != nil {
+		return nil, nil, err
+	}
+	data := make(chan []byte, 10000)
+	go conn.Collect(data)
+
+	var positions = make(ChanStreamPositions, 10000)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				close(positions)
+				return
+			case msgBytes := <-data:
+				var streamPositions []models.StreamPositions
+				err := json.Unmarshal(msgBytes, &streamPositions)
+				if err != nil {
+					println("failed to unmarshal")
+					continue // ignore malformed data
+				}
+				for _, p := range streamPositions {
+					positions <- p
+				}
+			}
+		}
+	}()
+	return conn, positions, nil
+}
+
+type ChanStreamOrders chan models.StreamOrders
+
+func (w *WebsocketClient) StreamOrders(ctx context.Context, params string) (*Conn, ChanStreamOrders, error) {
+	conn, err := w.Connect(fmt.Sprintf(OrdersSubscriptionPath, params))
+	if err != nil {
+		return nil, nil, err
+	}
+	data := make(chan []byte, 10000)
+	go conn.Collect(data)
+
+	var orders = make(ChanStreamOrders, 10000)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				close(orders)
+				return
+			case msgBytes := <-data:
+				var streamOrders []models.StreamOrders
+				err := json.Unmarshal(msgBytes, &streamOrders)
+				if err != nil {
+					println("failed to unmarshal")
+					continue // ignore malformed data
+				}
+				for _, o := range streamOrders {
+					orders <- o
+				}
+			}
+		}
+	}()
+	return conn, orders, nil
+}
+
+type ChanStreamTrades chan models.StreamTrades
+
+func (w *WebsocketClient) StreamTrades(ctx context.Context, params string) (*Conn, ChanStreamTrades, error) {
+	conn, err := w.Connect(fmt.Sprintf(TradesSubscriptionPath, params))
+	if err != nil {
+		return nil, nil, err
+	}
+	data := make(chan []byte, 10000)
+	go conn.Collect(data)
+
+	var trades = make(ChanStreamTrades, 10000)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				close(trades)
+				return
+			case msgBytes := <-data:
+				var streamTrades []models.StreamTrades
+				err := json.Unmarshal(msgBytes, &streamTrades)
+				if err != nil {
+					println("failed to unmarshal")
+					continue // ignore malformed data
+				}
+				for _, trade := range streamTrades {
+					trades <- trade
+				}
+			}
+		}
+	}()
+	return conn, trades, nil
 }

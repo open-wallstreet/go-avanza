@@ -52,6 +52,22 @@ type StreamQuote struct {
 	Channel string `json:"channel"`
 }
 
+type StreamTrades struct {
+	Channel string `json:"channel"`
+}
+
+type StreamOrders struct {
+	Channel string `json:"channel"`
+}
+
+type StreamPositions struct {
+	Channel string `json:"channel"`
+}
+
+type StreamOrderDepth struct {
+	Channel string `json:"channel"`
+}
+
 type HandshakeResponse struct {
 	MinimumVersion           string          `json:"minimumVersion"`
 	ClientID                 string          `json:"clientId"`

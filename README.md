@@ -1,4 +1,5 @@
 # Avanza Unofficial GO API Client
+[![Go Reference](https://pkg.go.dev/badge/github.com/open-wallstreet/go-avanza.svg)](https://pkg.go.dev/github.com/open-wallstreet/go-avanza)
 
 **Please note that I am not affiliated with Avanza Bank AB in any way. The underlying API can be taken down or changed without warning at any point in time.**
 
@@ -18,6 +19,12 @@ Here are the steps to get your TOTP Secret:
 3. Click "Kan du inte scanna QR-koden?" to reveal your TOTP Secret.
 4. Finally, run `go run github.com/open-wallstreet/go-avanza/cmd/totp 'PASTE_YOUR_TOTP_SECRET_HERE'` to generate an initial code.
 5. Done! From now on all you have to do is supply your secret in with `AVANZA_TOTP_SECRET` environment variable function as in the example below.
+
+## Documentation
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/open-wallstreet/go-avanza.svg)](https://pkg.go.dev/github.com/open-wallstreet/go-avanza)
+
+[Websocket](./docs/websocket.md)
 
 ## Roadmap
 
