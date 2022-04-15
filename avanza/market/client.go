@@ -14,7 +14,7 @@ const (
 )
 
 type MarketClient struct {
-	client.Client
+	*client.Client
 }
 
 func (a *MarketClient) GetInstrument(ctx context.Context, params *models.GetInstrumentParams, options ...models.RequestOption) (*models.GetInstrumentResponse, error) {

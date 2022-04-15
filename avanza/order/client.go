@@ -17,7 +17,7 @@ const (
 )
 
 type OrderClient struct {
-	client.Client
+	*client.Client
 }
 
 func (a *OrderClient) GetOrderBook(ctx context.Context, params *models.GetOrderBookParams, options ...models.RequestOption) (*models.GetOrderBookResponse, error) {

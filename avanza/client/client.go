@@ -20,7 +20,7 @@ type Client struct {
 	AuthTokens *models.AuthSessionTokens
 }
 
-func New() Client {
+func New() *Client {
 	rClient := resty.New()
 	rClient.SetBaseURL(BaseUrl)
 	rClient.SetRetryCount(DefaultRetryCount)
@@ -30,7 +30,7 @@ func New() Client {
 		"Content-Type": "application/json",
 		"User-Agent":   DefaultUserAgent,
 	})
-	return Client{
+	return &Client{
 		HTTP:    rClient,
 		encoder: NewEncoder(),
 	}
