@@ -1,5 +1,66 @@
 package models
 
+type GetMyCompanyEventsResponse struct {
+	Dividends struct {
+		PreliminaryDividends []struct {
+			Position struct {
+				OrderbookID    string `json:"orderbookId"`
+				Name           string `json:"name"`
+				FlagCode       string `json:"flagCode"`
+				InstrumentName string `json:"instrumentName"`
+			} `json:"position"`
+			PaymentDate  string `json:"paymentDate"`
+			ExDate       string `json:"exDate"`
+			DividendType string `json:"dividendType"`
+			Quantity     struct {
+				Value            float64 `json:"value"`
+				Unit             string  `json:"unit"`
+				UnitType         string  `json:"unitType"`
+				DecimalPrecision int     `json:"decimalPrecision"`
+			} `json:"quantity"`
+			SekQuantity struct {
+				Value            float64 `json:"value"`
+				Unit             string  `json:"unit"`
+				UnitType         string  `json:"unitType"`
+				DecimalPrecision int     `json:"decimalPrecision"`
+			} `json:"sekQuantity"`
+		} `json:"preliminaryDividends"`
+		ConfirmedDividends []struct {
+			Position struct {
+				OrderbookID    string `json:"orderbookId"`
+				Name           string `json:"name"`
+				FlagCode       string `json:"flagCode"`
+				InstrumentName string `json:"instrumentName"`
+			} `json:"position"`
+			PaymentDate  string `json:"paymentDate"`
+			ExDate       string `json:"exDate"`
+			DividendType string `json:"dividendType"`
+			Quantity     struct {
+				Value            float64 `json:"value"`
+				Unit             string  `json:"unit"`
+				UnitType         string  `json:"unitType"`
+				DecimalPrecision int     `json:"decimalPrecision"`
+			} `json:"quantity"`
+			SekQuantity struct {
+				Value            float64 `json:"value"`
+				Unit             string  `json:"unit"`
+				UnitType         string  `json:"unitType"`
+				DecimalPrecision int     `json:"decimalPrecision"`
+			} `json:"sekQuantity"`
+		} `json:"confirmedDividends"`
+	} `json:"dividends"`
+	Reports []struct {
+		Date     string `json:"date"`
+		Type     string `json:"type"`
+		Position struct {
+			OrderbookID    string `json:"orderbookId"`
+			Name           string `json:"name"`
+			FlagCode       string `json:"flagCode"`
+			InstrumentName string `json:"instrumentName"`
+		} `json:"position"`
+	} `json:"reports"`
+}
+
 type GetTransactionsResponse struct {
 	Transactions              []Transaction `json:"transactions"`
 	TotalNumberOfTransactions int           `json:"totalNumberOfTransactions"`
@@ -34,7 +95,7 @@ type Transaction struct {
 }
 
 type GetTransactionsParams struct {
-	AccountID string `path:"accountId" validate:"required"`
+	AccountID    string    `path:"accountId" validate:"required"`
 	FromDate     *Date     `query:"from"`
 	ToDate       *Date     `query:"to"`
 	OrderBookIds *[]string `query:"orderbookId"`
@@ -42,7 +103,7 @@ type GetTransactionsParams struct {
 	MaxAmount    *float64  `query:"maxAmount"`
 }
 type AccountOverviewParams struct {
-	AccountID    string    `path:"accountId" validate:"required"`
+	AccountID string `path:"accountId" validate:"required"`
 }
 
 type AccountOverviewResponse struct {
