@@ -35,7 +35,7 @@ func (a *AccountClient) GetAccountOverview(ctx context.Context, params *models.A
 	return res, err
 }
 
-// GetPositions gets all positions
+// GetPositions gets all positions for your account
 func (a *AccountClient) GetPositions(ctx context.Context, options ...models.RequestOption) (*models.GetPositionsResponse, error) {
 	res := &models.GetPositionsResponse{}
 	params := &models.GetPositionsParams{}
@@ -43,6 +43,7 @@ func (a *AccountClient) GetPositions(ctx context.Context, options ...models.Requ
 	return res, err
 }
 
+// GetDealsAndOrders gets all deals and orders for your account that is currently active
 func (a *AccountClient) GetDealsAndOrders(ctx context.Context, options ...models.RequestOption) (*models.GetDealsAndOrdersResponse, error) {
 	res := &models.GetDealsAndOrdersResponse{}
 	params := &models.GetDealsAndOrdersParams{}
@@ -50,12 +51,14 @@ func (a *AccountClient) GetDealsAndOrders(ctx context.Context, options ...models
 	return res, err
 }
 
+// GetTransactions gets all your transactions. Can be filtered to include more or less data see models.GetTransactionsParams
 func (a *AccountClient) GetTransactions(ctx context.Context, params *models.GetTransactionsParams, options ...models.RequestOption) (*models.GetTransactionsResponse, error) {
 	res := &models.GetTransactionsResponse{}
 	err := a.Call(ctx, http.MethodGet, GetTransactionsPath, params, res, options...)
 	return res, err
 }
 
+// GetMyCompanyEvents Gets data about upcoming events companies you hold will have. (Dividends, splits etc)
 func (a *AccountClient) GetMyCompanyEvents(ctx context.Context, options ...models.RequestOption) (*models.GetMyCompanyEventsResponse, error) {
 	res := &models.GetMyCompanyEventsResponse{}
 	type empty struct{}

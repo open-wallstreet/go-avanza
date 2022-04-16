@@ -26,6 +26,10 @@ type AuthClient struct {
 	totpSecret          string
 }
 
+// Authenticate will authenticate against Avanza using a TOTP secret for 2FA. Currently only supported version.
+// It will also set up a refresh every 24 minutes to keep the session up.
+//
+// Make sure not to save the totpSecret into your code
 func (a *AuthClient) Authenticate(ctx context.Context, username, password, totpSecret string, options ...models.RequestOption) (*models.AuthenticateTOTPResponse, error) {
 	res := &models.UserCredentialsResponse{}
 	a.totpSecret = totpSecret
@@ -73,6 +77,8 @@ func (a *AuthClient) reAuthenticate() {
 	}
 }
 
+// Close Will close the reAuthenticateTimer timer if it has been initialized. Called from parent Close method.
+// No need to call it manually
 func (a *AuthClient) Close() {
 	if a.reAuthenticateTimer != nil {
 		a.reAuthenticateTimer.Stop()
