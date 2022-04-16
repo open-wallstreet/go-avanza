@@ -32,7 +32,7 @@ Docs: [![Go Reference](https://pkg.go.dev/badge/github.com/open-wallstreet/go-av
 ```go
 // You can create a new client simply like this
 func main() {
-	client := goavanza.New()
+    client := goavanza.New()
     defer client.Close()
 }
 ```
