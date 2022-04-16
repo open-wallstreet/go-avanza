@@ -1,5 +1,6 @@
 # Avanza Unofficial GO API Client
 [![Go Reference](https://pkg.go.dev/badge/github.com/open-wallstreet/go-avanza.svg)](https://pkg.go.dev/github.com/open-wallstreet/go-avanza)
+![CI](https://github.com/open-wallstreet/go-avanza/actions/workflows/build_and_test.yml/badge.svg)
 
 **Please note that I am not affiliated with Avanza Bank AB in any way. The underlying API can be taken down or changed without warning at any point in time.**
 
@@ -22,9 +23,38 @@ Here are the steps to get your TOTP Secret:
 
 ## Documentation
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/open-wallstreet/go-avanza.svg)](https://pkg.go.dev/github.com/open-wallstreet/go-avanza)
+Docs: [![Go Reference](https://pkg.go.dev/badge/github.com/open-wallstreet/go-avanza.svg)](https://pkg.go.dev/github.com/open-wallstreet/go-avanza)
 
-[Websocket](./docs/websocket.md)
+[Websocket information](./docs/websocket.md)
+
+## Quick Guide
+
+```go
+// You can create a new client simply like this
+func main() {
+	client := goavanza.New()
+    defer client.Close()
+}
+```
+
+```go
+// Or if you need to debug http responses
+func main() {
+    client := goavanza.New(goavanza.WithDebug(true))
+    defer client.Close()
+}
+```
+
+Most API calls need you to authenticate using a TOPT token. see [Getting a TOTP Secret](#Getting a TOTP Secret) section how to create one.
+After that call the `Authenticate method`
+```go
+authenticate, err := client.Auth.Authenticate(context.Background(), username, password, totpSecret)
+```
+
+**You should not save your username, password or totpSecret in your code. You ENV variables or other ways to encrypt or hide the data**
+
+See `/examples` or [GoDocs](https://pkg.go.dev/github.com/open-wallstreet/go-avanza) for more information
+
 
 ### Shoutouts
 

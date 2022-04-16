@@ -1,3 +1,23 @@
+// Package goavanza is a Go Unoffical API Client for Avanza Bank AB
+//
+// Please note that I am not affiliated with Avanza Bank AB in any way. The underlying API can be taken down or changed without warning at any point in time.
+//
+// To install the package simply run
+//  go get github.com/open-wallstreet/go-avanza
+//
+//
+// You can create a new client simply like this
+//  func main() {
+//      client := goavanza.New()
+//      defer client.Close()
+//  }
+//
+// Or if you need to debug http responses
+//  func main() {
+//      client := goavanza.New(goavanza.WithDebug(true))
+//      defer client.Close()
+//  }
+//
 package goavanza
 
 import (
