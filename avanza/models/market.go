@@ -1,5 +1,40 @@
 package models
 
+type GetMarketDataParams struct {
+	OrderBookID string `path:"orderbookID" validate:"required"`
+}
+
+type GetMarketDataResponse struct {
+	Quote struct {
+		Buy               float64 `json:"buy"`
+		Sell              float64 `json:"sell"`
+		Last              float64 `json:"last"`
+		Highest           float64 `json:"highest"`
+		Lowest            float64 `json:"lowest"`
+		Change            float64 `json:"change"`
+		ChangePercent     float64 `json:"changePercent"`
+		TimeOfLast        string  `json:"timeOfLast"`
+		TotalValueTraded  float64 `json:"totalValueTraded"`
+		TotalVolumeTraded int     `json:"totalVolumeTraded"`
+		Updated           string  `json:"updated"`
+	} `json:"quote"`
+	OrderDepth struct {
+		ReceivedTime Millis `json:"receivedTime"`
+		Levels       []struct {
+			BuySide struct {
+				Price  float64 `json:"price"`
+				Volume int     `json:"volume"`
+			} `json:"buySide"`
+			SellSide struct {
+				Price  float64 `json:"price"`
+				Volume int     `json:"volume"`
+			} `json:"sellSide"`
+		} `json:"levels"`
+		MarketMakerExpected bool `json:"marketMakerExpected"`
+	} `json:"orderDepth"`
+	Trades []interface{} `json:"trades"`
+}
+
 type GetInstrumentParams struct {
 	Instrument InstrumentType `path:"instrument" validate:"required"`
 	ID         string         `path:"id" validate:"required"`

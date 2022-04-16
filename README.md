@@ -26,28 +26,6 @@ Here are the steps to get your TOTP Secret:
 
 [Websocket](./docs/websocket.md)
 
-## Roadmap
-
-- [x] Authenticate / Reauthenticate
-- [x] GetPositions
-- [x] GetOverview
-- [x] GetAccountOverview
-- [x] GetDealsAndOrders
-- [x] GetTransactions
-- [ ] GetWatchlists
-- [ ] AddToWatchlist
-- [x] GetInstrument
-- [x] GetOrderbook
-- [x] GetOrderbooks
-- [ ] GetInspirationLists
-- [ ] GetInspirationList
-- [x] GetOrder
-- [x] EditOrder
-- [x] DeleteOrder
-- [ ] Websocket RealTime data
-  - [x] Orders
-  - [ ] Quotes
-
 ### Shoutouts
 
 Major inspiration goes to [Node.js unofficial avanza api](https://github.com/fhqvst/avanza)
@@ -55,3 +33,8 @@ Major inspiration goes to [Node.js unofficial avanza api](https://github.com/fhq
 ### RESPONSIBILITIES
 
 The author of this software is not responsible for any indirect damages (foreseeable or unforeseeable), such as, if necessary, loss or alteration of or fraudulent access to data, accidental transmission of viruses or of any other harmful element, loss of profits or opportunities, the cost of replacement goods and services or the attitude and behavior of a third party.
+
+
+### Known issues
+
+- GetMarketData response does not have correct interface mapping due to not being able to seen a response with data in it yet. 

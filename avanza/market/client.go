@@ -11,6 +11,7 @@ import (
 const (
 	GetInstrumentPath = "/_mobile/market/{instrument}/{id}"
 	SearchPath        = "/_mobile/market/search/{instrument}"
+	GetMarketDataPath = "/_cqbe/trading/marketdata/{orderbookID}"
 )
 
 type MarketClient struct {
@@ -27,5 +28,11 @@ func (a *MarketClient) GetInstrument(ctx context.Context, params *models.GetInst
 func (a *MarketClient) Search(ctx context.Context, params *models.SearchParams, options ...models.RequestOption) (*models.SearchResponse, error) {
 	res := &models.SearchResponse{}
 	err := a.Call(ctx, http.MethodGet, SearchPath, params, res, options...)
+	return res, err
+}
+
+func (a *MarketClient) GetMarketData(ctx context.Context, params *models.GetMarketDataParams, options ...models.RequestOption) (*models.GetMarketDataResponse, error) {
+	res := &models.GetMarketDataResponse{}
+	err := a.Call(ctx, http.MethodGet, GetMarketDataPath, params, res, options...)
 	return res, err
 }
