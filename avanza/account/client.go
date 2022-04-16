@@ -13,6 +13,7 @@ const (
 	GetPositionsPath      = "/_mobile/account/positions"
 	GetDealsAndOrdersPath = "/_mobile/account/dealsandorders"
 	GetTransactionsPath   = "/_mobile/account/transactions/{accountId}"
+	GetMyCompanyEvents    = "/_cqbe/market/my-company-events"
 )
 
 type AccountClient struct {
@@ -52,5 +53,12 @@ func (a *AccountClient) GetDealsAndOrders(ctx context.Context, options ...models
 func (a *AccountClient) GetTransactions(ctx context.Context, params *models.GetTransactionsParams, options ...models.RequestOption) (*models.GetTransactionsResponse, error) {
 	res := &models.GetTransactionsResponse{}
 	err := a.Call(ctx, http.MethodGet, GetTransactionsPath, params, res, options...)
+	return res, err
+}
+
+func (a *AccountClient) GetMyCompanyEvents(ctx context.Context, options ...models.RequestOption) (*models.GetMyCompanyEventsResponse, error) {
+	res := &models.GetMyCompanyEventsResponse{}
+	type empty struct{}
+	err := a.Call(ctx, http.MethodGet, GetMyCompanyEvents, empty{}, res, options...)
 	return res, err
 }

@@ -37,4 +37,5 @@ The author of this software is not responsible for any indirect damages (foresee
 
 ### Known issues
 
-- GetMarketData response does not have correct interface mapping due to not being able to seen a response with data in it yet. 
+- GetMarketData response does not have correct interface mapping due to not being able to seen a response with data in it yet.
+- Most streaming data has not been mapped to correct structs due to not being able to test responses due to Avanza being down for maintenance during development
