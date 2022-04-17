@@ -58,7 +58,7 @@ type GetInstrumentResponse struct {
 	BuyPrice                float64 `json:"buyPrice"`
 	LowestPrice             float64 `json:"lowestPrice"`
 	HighestPrice            float64 `json:"highestPrice"`
-	TotalVolumeTraded       int     `json:"totalVolumeTraded"`
+	TotalVolumeTraded       float64 `json:"totalVolumeTraded"`
 	SellPrice               float64 `json:"sellPrice"`
 	Isin                    string  `json:"isin"`
 	LastPrice               float64 `json:"lastPrice"`

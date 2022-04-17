@@ -18,8 +18,7 @@ Here are the steps to get your TOTP Secret:
 1. Click "Aktivera" on the next screen.
 2. Select "Annan app för tvåfaktorsinloggning".
 3. Click "Kan du inte scanna QR-koden?" to reveal your TOTP Secret.
-4. Finally, run `go run github.com/open-wallstreet/go-avanza/cmd/totp 'PASTE_YOUR_TOTP_SECRET_HERE'` to generate an initial code.
-5. Done! From now on all you have to do is supply your secret in with `AVANZA_TOTP_SECRET` environment variable function as in the example below.
+4. That codes should be passed into the `Authenticate` method. Make sure not to save it into your codebase. Instead supply it trough environment variables or other encoded systems.
 
 ## Documentation
 
@@ -54,6 +53,19 @@ authenticate, err := client.Auth.Authenticate(context.Background(), username, pa
 **You should not save your username, password or totpSecret in your code. You ENV variables or other ways to encrypt or hide the data**
 
 See `/examples` or [GoDocs](https://pkg.go.dev/github.com/open-wallstreet/go-avanza) for more information
+
+## CLI tool
+You can install the CLI tool by running
+
+```bash
+go install github.com/open-wallstreet/go-avanza
+```
+
+Afterwards you can download complete Avanza stock list by running the download command
+
+```bash
+go-avanza downloader stocks-list -o myfile.csv
+```
 
 
 ### Shoutouts
