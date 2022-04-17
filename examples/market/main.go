@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	avanza "github.com/open-wallstreet/go-avanza"
+	"github.com/open-wallstreet/go-avanza/avanza"
 	"github.com/open-wallstreet/go-avanza/avanza/models"
 	"log"
 )
@@ -11,7 +11,7 @@ func main() {
 	client := avanza.New(avanza.WithDebug(true))
 	defer client.Close()
 	search, err := client.Market.Search(context.Background(), &models.SearchParams{
-		Query:      "novotek",
+		Query: "novotek",
 	})
 	if err != nil {
 		log.Fatalf(err.Error())
