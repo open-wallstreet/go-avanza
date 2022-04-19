@@ -32,7 +32,15 @@ type GetMarketDataResponse struct {
 		} `json:"levels"`
 		MarketMakerExpected bool `json:"marketMakerExpected"`
 	} `json:"orderDepth"`
-	Trades []interface{} `json:"trades"`
+	Trades []struct {
+		Buyer           string  `json:"buyer"`
+		Seller          string  `json:"seller"`
+		DealTime        int64   `json:"dealTime"`
+		Price           float64 `json:"price"`
+		Volume          int     `json:"volume"`
+		MatchedOnMarket bool    `json:"matchedOnMarket"`
+		Cancelled       bool    `json:"cancelled"`
+	} `json:"trades"`
 }
 
 type GetInstrumentParams struct {
