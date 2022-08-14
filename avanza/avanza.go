@@ -42,7 +42,7 @@ func New(opts ...func(a *AvanzaClient)) *AvanzaClient {
 	c := client.New()
 	a := &AvanzaClient{
 		Client:    c,
-		Auth:      &auth.AuthClient{Client: c},
+		Auth:      auth.NewAuthClient(c),
 		Account:   &account.AccountClient{Client: c},
 		Market:    &market.MarketClient{Client: c},
 		Order:     &order.OrderClient{Client: c},

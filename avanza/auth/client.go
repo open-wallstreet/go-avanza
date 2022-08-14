@@ -15,22 +15,35 @@ const (
 	UserCredentialsPath = "/_api/authentication/sessions/usercredentials"
 	TOTPPath            = "/_api/authentication/sessions/totp"
 )
-const MaxInactiveMinutes = 24
+const MinInactiveMinutes = 30
+const MaxInactiveMinutes = 60 * 24
 
 // AuthClient defines a REST Client for Authentication API:s
 type AuthClient struct {
 	*client.Client
-	reAuthenticateTimer *time.Timer
-	username            string
-	password            string
-	totpSecret          string
+	reAuthenticateTimer   *time.Timer
+	username              string
+	password              string
+	totpSecret            string
+	authenticationTimeout int
+}
+
+func NewAuthClient(c *client.Client) *AuthClient {
+	return &AuthClient{
+		Client:                c,
+		authenticationTimeout: MaxInactiveMinutes,
+	}
 }
 
 // Authenticate will authenticate against Avanza using a TOTP secret for 2FA. Currently only supported version.
-// It will also set up a refresh every 24 minutes to keep the session up.
+// It will also set up a refresh every MaxInactiveMinutes - 1 minute to keep the session up.
 //
 // Make sure not to save the totpSecret into your code
 func (a *AuthClient) Authenticate(ctx context.Context, username, password, totpSecret string, options ...models.RequestOption) (*models.AuthenticateTOTPResponse, error) {
+	if !(a.authenticationTimeout <= MaxInactiveMinutes || a.authenticationTimeout >= MinInactiveMinutes) {
+		return nil, fmt.Errorf("session timeout (%d) not in range  %d - %d minutes", a.authenticationTimeout, MinInactiveMinutes, MaxInactiveMinutes)
+	}
+
 	res := &models.UserCredentialsResponse{}
 	a.totpSecret = totpSecret
 	a.username = username
@@ -38,7 +51,7 @@ func (a *AuthClient) Authenticate(ctx context.Context, username, password, totpS
 	params := &models.UserCredentialsParams{
 		Username:           username,
 		Password:           password,
-		MaxInactiveMinutes: MaxInactiveMinutes * 60,
+		MaxInactiveMinutes: a.authenticationTimeout,
 	}
 	err := a.Call(ctx, http.MethodPost, UserCredentialsPath, params, res, options...)
 	if res.TwoFactorLogin.Method != "TOTP" {
@@ -48,7 +61,8 @@ func (a *AuthClient) Authenticate(ctx context.Context, username, password, totpS
 	if err != nil {
 		return authenticateTotp, err
 	}
-	a.reAuthenticateTimer = time.AfterFunc((MaxInactiveMinutes-1)*time.Minute, a.reAuthenticate)
+	reAuthDuration := time.Duration(a.authenticationTimeout-1) * time.Minute
+	a.reAuthenticateTimer = time.AfterFunc(reAuthDuration, a.reAuthenticate)
 	return authenticateTotp, err
 }
 
