@@ -2,14 +2,15 @@ package market
 
 import (
 	"context"
-	"github.com/open-wallstreet/go-avanza/avanza/client"
-	"github.com/open-wallstreet/go-avanza/avanza/models"
 	"net/http"
 	"strings"
+
+	"github.com/open-wallstreet/go-avanza/avanza/client"
+	"github.com/open-wallstreet/go-avanza/avanza/models"
 )
 
 const (
-	GetInstrumentPath = "/_mobile/market/{instrument}/{id}"
+	GetInstrumentPath = "/_api/market-guide/{instrument}/{id}"
 	SearchPath        = "/_mobile/market/search/{instrument}"
 	GetMarketDataPath = "/_cqbe/trading/marketdata/{orderbookID}"
 )
