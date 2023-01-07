@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
+
 	"github.com/open-wallstreet/go-avanza/avanza"
 	"github.com/open-wallstreet/go-avanza/avanza/models"
-	"log"
 )
 
 func main() {

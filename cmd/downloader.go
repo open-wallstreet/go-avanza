@@ -3,12 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/jszwec/csvutil"
-	client2 "github.com/open-wallstreet/go-avanza/avanza/client"
-	"github.com/open-wallstreet/go-avanza/avanza/market"
-	"github.com/open-wallstreet/go-avanza/avanza/models"
-	"github.com/schollz/progressbar/v3"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -16,6 +10,13 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/jszwec/csvutil"
+	client2 "github.com/open-wallstreet/go-avanza/avanza/client"
+	"github.com/open-wallstreet/go-avanza/avanza/market"
+	"github.com/open-wallstreet/go-avanza/avanza/models"
+	"github.com/schollz/progressbar/v3"
 
 	"github.com/spf13/cobra"
 )
@@ -39,6 +40,7 @@ type stocksListData struct {
 	MarketList            string `csv:"market_list"`
 	Ticker                string `csv:"ticker"`
 	Sector                string `csv:"sector"`
+	Type                  string `csv:"type"`
 }
 
 var stocksListCmd = &cobra.Command{
@@ -67,16 +69,15 @@ var stocksListCmd = &cobra.Command{
 				return
 			}
 			data = append(data, &stocksListData{
-				AvanzaID:              instrument.ID,
+				AvanzaID:              instrument.OrderbookID,
 				ISIN:                  instrument.Isin,
-				MarketCapital:         instrument.Company.MarketCapital,
-				Sector:                instrument.Company.Sector,
-				MarketCapitalCurrency: instrument.Company.MarketCapitalCurrency,
-				TotalNumberOfShares:   instrument.Company.TotalNumberOfShares,
-				Country:               instrument.Country,
+				MarketCapital:         int(instrument.KeyIndicators.MarketCapital.Value),
+				MarketCapitalCurrency: instrument.Listing.Currency,
+				Country:               instrument.Listing.CountryCode,
 				Name:                  instrument.Name,
-				MarketList:            instrument.MarketList,
-				Ticker:                instrument.TickerSymbol,
+				MarketList:            instrument.Listing.MarketListName,
+				Ticker:                instrument.Listing.TickerSymbol,
+				Type:                  instrument.Type,
 			})
 		}
 
