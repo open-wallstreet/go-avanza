@@ -13,6 +13,7 @@ const (
 	GetInstrumentPath = "/_api/market-guide/{instrument}/{id}"
 	SearchPath        = "/_mobile/market/search/{instrument}"
 	GetMarketDataPath = "/_cqbe/trading/marketdata/{orderbookID}"
+	GetChartDataPath  = "/_api/price-chart/stock/{orderbookID}?timePeriod=five_years&resolution=day"
 )
 
 type MarketClient struct {
@@ -38,5 +39,11 @@ func (a *MarketClient) Search(ctx context.Context, params *models.SearchParams, 
 func (a *MarketClient) GetMarketData(ctx context.Context, params *models.GetMarketDataParams, options ...models.RequestOption) (*models.GetMarketDataResponse, error) {
 	res := &models.GetMarketDataResponse{}
 	err := a.Call(ctx, http.MethodGet, GetMarketDataPath, params, res, options...)
+	return res, err
+}
+
+func (a *MarketClient) GetChartData(ctx context.Context, params *models.GetMarketDataParams, options ...models.RequestOption) (*models.GetChartDataResponse, error) {
+	res := &models.GetChartDataResponse{}
+	err := a.Call(ctx, http.MethodGet, GetChartDataPath, params, res, options...)
 	return res, err
 }

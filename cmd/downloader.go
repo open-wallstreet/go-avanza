@@ -24,7 +24,7 @@ import (
 // downloaderCmd represents the downloader command
 var downloaderCmd = &cobra.Command{
 	Use:   "downloader",
-	Short: "Extract and download data into files",
+	Short: "Extract and download daily data into files",
 	Long: `Extract and download different types of data from Avanza that can be saved into files
 for easy import into databases or other programs.`,
 }
@@ -41,6 +41,73 @@ type stocksListData struct {
 	Ticker                string `csv:"ticker"`
 	Sector                string `csv:"sector"`
 	Type                  string `csv:"type"`
+}
+
+type chartDataCSV struct {
+	Date   string  `csv:"Date"`
+	Open   float64 `csv:"Open"`
+	High   float64 `csv:"High"`
+	Close  float64 `csv:"Close"`
+	Low    float64 `csv:"Low"`
+	Volume int     `csv:"Volume"`
+}
+
+var dailyCmd = &cobra.Command{
+	Use:   "daily",
+	Short: "Download OHLC data for a stock",
+	Long:  `Download OHLC data for a stock.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Downloading data")
+		id := cmd.Flag("id").Value.String()
+		fmt.Println(id)
+
+		client := market.MarketClient{
+			Client: client2.New(),
+		}
+		chartData, err := client.GetChartData(context.Background(), &models.GetMarketDataParams{
+			OrderBookID: id,
+		})
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		size := len(chartData.Ohlc)
+		data := make([]*chartDataCSV, 0, size)
+		for _, ohlc := range chartData.Ohlc {
+			ts := time.Unix(ohlc.Timestamp/1000, 0)
+			data = append(data, &chartDataCSV{
+				//TimeStamp: ts.Format(time.RFC3339),
+				Date:   ts.Format("2006-01-02"),
+				Open:   ohlc.Open,
+				Close:  ohlc.Close,
+				High:   ohlc.High,
+				Low:    ohlc.Low,
+				Volume: ohlc.TotalVolumeTraded,
+			})
+		}
+
+		instrument, err := client.GetInstrument(context.Background(), &models.GetInstrumentParams{
+			Instrument: models.Stock,
+			ID:         id,
+		})
+		fileName := instrument.Listing.TickerSymbol + ".csv"
+
+		b, err := csvutil.Marshal(data)
+		if err != nil {
+			fmt.Println("error:", err)
+			return
+		}
+
+		permissions := 0644 // or whatever you need
+		err = ioutil.WriteFile(fileName, b, fs.FileMode(permissions))
+		if err != nil {
+			fmt.Println("error:", err)
+			return
+		}
+		//fmt.Println(chartData)
+	},
 }
 
 var stocksListCmd = &cobra.Command{
@@ -97,12 +164,16 @@ var stocksListCmd = &cobra.Command{
 }
 
 var OutputPath = ""
+var AvanzaID = ""
 
 func init() {
 	rootCmd.AddCommand(downloaderCmd)
 	downloaderCmd.AddCommand(stocksListCmd)
+	downloaderCmd.AddCommand(dailyCmd)
 	stocksListCmd.Flags().StringVarP(&OutputPath, "output", "o", "", "output file")
 	stocksListCmd.MarkFlagRequired("output")
+	dailyCmd.Flags().StringVarP(&AvanzaID, "id", "i", "", "AvanzaID")
+	dailyCmd.MarkFlagRequired("id")
 }
 
 const ExtractUrl = "https://www.avanza.se/frontend/template.html/marketing/advanced-filter/advanced-filter-template?%d&parameters.startIndex=0&parameters.maxResults=90000"

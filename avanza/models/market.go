@@ -4,6 +4,26 @@ type GetMarketDataParams struct {
 	OrderBookID string `path:"orderbookID" validate:"required"`
 }
 
+type GetChartDataResponse struct {
+	Ohlc []struct {
+		Timestamp         int64   `json:"timestamp"`
+		Open              float64 `json:"open"`
+		Close             float64 `json:"close"`
+		Low               float64 `json:"low"`
+		High              float64 `json:"high"`
+		TotalVolumeTraded int     `json:"totalVolumeTraded"`
+	} `json:"ohlc"`
+	Metadata struct {
+		Resolution struct {
+			ChartResolution      string   `json:"chartResolution"`
+			AvailableResolutions []string `json:"availableResolutions"`
+		} `json:"resolution"`
+	} `json:"metadata"`
+	From                 string  `json:"from"`
+	To                   string  `json:"to"`
+	PreviousClosingPrice float64 `json:"previousClosingPrice"`
+}
+
 type GetMarketDataResponse struct {
 	Quote struct {
 		Buy               float64 `json:"buy"`
