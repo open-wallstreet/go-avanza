@@ -3,12 +3,13 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/open-wallstreet/go-avanza/avanza/client"
-	"github.com/open-wallstreet/go-avanza/avanza/models"
-	"github.com/pquerna/otp/totp"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/open-wallstreet/go-avanza/avanza/client"
+	"github.com/open-wallstreet/go-avanza/avanza/models"
+	"github.com/pquerna/otp/totp"
 )
 
 const (

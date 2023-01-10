@@ -6,6 +6,8 @@ type GetMarketDataParams struct {
 
 type GetChartDataParams struct {
 	OrderBookID string `path:"orderbookID" validate:"required"`
+	Resolution  string `path:"resolution"`
+	TimePeriod  string `path:"timePeriod"`
 }
 
 type GetChartDataResponse struct {
