@@ -13,7 +13,30 @@ const (
 	GetInstrumentPath = "/_api/market-guide/{instrument}/{id}"
 	SearchPath        = "/_mobile/market/search/{instrument}"
 	GetMarketDataPath = "/_cqbe/trading/marketdata/{orderbookID}"
-	GetChartDataPath  = "/_api/price-chart/stock/{orderbookID}?timePeriod=five_years&resolution=day"
+	GetChartDataPath  = "/_api/price-chart/stock/{orderbookID}?timePeriod={timePeriod}&resolution={resolution}"
+)
+
+const (
+	ChartDataTimePeriodOneToday    = "today"
+	ChartDataTimePeriodOneWeek     = "one_week"
+	ChartDataTimePeriodOneMonth    = "one_month"
+	ChartDataTimePeriodThreeMonths = "three_months"
+	ChartDataTimePeriodSixMonths   = "six_months"
+	ChartDataTimePeriodThisYear    = "this_year"
+	ChartDataTimePeriodOneYear     = "one_year"
+	ChartDataTimePeriodThreeYears  = "three_years"
+	ChartDataTimePeriodFiveYears   = "five_years"
+	ChartDataTimePeriodInfinity    = "infinity"
+)
+
+const (
+	ChartDataResolutionMinute    = "minute"
+	ChartDataResolutionTwoMin    = "two_minutes"
+	ChartDataResolutionTenMin    = "ten_minutes"
+	ChartDataResolutionThirtyMin = "thirty_minutes"
+	ChartDataResolutionHour      = "hour"
+	ChartDataResolutionDay       = "day"
+	ChartDataResolutionWeek      = "week"
 )
 
 type MarketClient struct {

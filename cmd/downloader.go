@@ -66,6 +66,8 @@ var dailyCmd = &cobra.Command{
 		}
 		chartData, err := client.GetChartData(context.Background(), &models.GetChartDataParams{
 			OrderBookID: id,
+			Resolution:  market.ChartDataResolutionDay,
+			TimePeriod:  market.ChartDataTimePeriodFiveYears,
 		})
 
 		if err != nil {
@@ -78,7 +80,6 @@ var dailyCmd = &cobra.Command{
 		for _, ohlc := range chartData.OHLC {
 			ts := time.Unix(ohlc.Timestamp/1000, 0)
 			data = append(data, &chartDataCSV{
-				//TimeStamp: ts.Format(time.RFC3339),
 				Date:   ts.Format("2006-01-02"),
 				Open:   ohlc.Open,
 				Close:  ohlc.Close,
@@ -92,7 +93,7 @@ var dailyCmd = &cobra.Command{
 			Instrument: models.Stock,
 			ID:         id,
 		})
-		fileName := instrument.Listing.TickerSymbol + ".csv"
+		fileName := instrument.Listing.TickerSymbol + "_daily.csv"
 
 		b, err := csvutil.Marshal(data)
 		if err != nil {
@@ -106,7 +107,6 @@ var dailyCmd = &cobra.Command{
 			fmt.Println("error:", err)
 			return
 		}
-		//fmt.Println(chartData)
 	},
 }
 
