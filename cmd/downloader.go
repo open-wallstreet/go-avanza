@@ -64,7 +64,7 @@ var dailyCmd = &cobra.Command{
 		client := market.MarketClient{
 			Client: client2.New(),
 		}
-		chartData, err := client.GetChartData(context.Background(), &models.GetMarketDataParams{
+		chartData, err := client.GetChartData(context.Background(), &models.GetChartDataParams{
 			OrderBookID: id,
 		})
 

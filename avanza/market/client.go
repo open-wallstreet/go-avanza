@@ -42,7 +42,7 @@ func (a *MarketClient) GetMarketData(ctx context.Context, params *models.GetMark
 	return res, err
 }
 
-func (a *MarketClient) GetChartData(ctx context.Context, params *models.GetMarketDataParams, options ...models.RequestOption) (*models.GetChartDataResponse, error) {
+func (a *MarketClient) GetChartData(ctx context.Context, params *models.GetChartDataParams, options ...models.RequestOption) (*models.GetChartDataResponse, error) {
 	res := &models.GetChartDataResponse{}
 	err := a.Call(ctx, http.MethodGet, GetChartDataPath, params, res, options...)
 	return res, err
