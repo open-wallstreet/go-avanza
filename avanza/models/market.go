@@ -17,7 +17,7 @@ type GetChartDataResponse struct {
 		Close             float64 `json:"close"`
 		Low               float64 `json:"low"`
 		High              float64 `json:"high"`
-		TotalVolumeTraded float64 `json:"totalVolumeTraded"`
+		TotalVolumeTraded int64   `json:"totalVolumeTraded"`
 	} `json:"ohlc"`
 	Metadata struct {
 		Resolution struct {

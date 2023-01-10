@@ -49,7 +49,7 @@ type chartDataCSV struct {
 	High   float64 `csv:"High"`
 	Close  float64 `csv:"Close"`
 	Low    float64 `csv:"Low"`
-	Volume float64 `csv:"Volume"`
+	Volume int64   `csv:"Volume"`
 }
 
 var dailyCmd = &cobra.Command{
