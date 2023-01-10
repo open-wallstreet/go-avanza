@@ -49,7 +49,7 @@ type chartDataCSV struct {
 	High   float64 `csv:"High"`
 	Close  float64 `csv:"Close"`
 	Low    float64 `csv:"Low"`
-	Volume int     `csv:"Volume"`
+	Volume float64 `csv:"Volume"`
 }
 
 var dailyCmd = &cobra.Command{
@@ -73,9 +73,9 @@ var dailyCmd = &cobra.Command{
 			return
 		}
 
-		size := len(chartData.Ohlc)
+		size := len(chartData.OHLC)
 		data := make([]*chartDataCSV, 0, size)
-		for _, ohlc := range chartData.Ohlc {
+		for _, ohlc := range chartData.OHLC {
 			ts := time.Unix(ohlc.Timestamp/1000, 0)
 			data = append(data, &chartDataCSV{
 				//TimeStamp: ts.Format(time.RFC3339),
