@@ -20,14 +20,14 @@ const (
 	TradesSubscriptionPath     = "/trades/%s"
 )
 
-type WebsocketClient struct {
+type Client struct {
 	*client.Client
 	Dialer       *websocket.Dialer
 	messageCount int
 	clientID     string
 }
 
-func (w *WebsocketClient) Connect(params string) (*Conn, error) {
+func (w *Client) Connect(params string) (*Conn, error) {
 	conn, err := w.dial()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to websocket server: %v", err)
@@ -41,7 +41,7 @@ func (w *WebsocketClient) Connect(params string) (*Conn, error) {
 	return conn, nil
 }
 
-func (w *WebsocketClient) dial() (*Conn, error) {
+func (w *Client) dial() (*Conn, error) {
 	if w.Client.AuthTokens == nil {
 		return nil, fmt.Errorf("you need to authenticate before using websockets")
 	}
@@ -58,7 +58,7 @@ func (w *WebsocketClient) dial() (*Conn, error) {
 
 type ChanStreamQuotes chan models.StreamQuote
 
-func (w *WebsocketClient) StreamQuotes(ctx context.Context, params string) (*Conn, ChanStreamQuotes, error) {
+func (w *Client) StreamQuotes(ctx context.Context, params string) (*Conn, ChanStreamQuotes, error) {
 	conn, err := w.Connect(fmt.Sprintf(QuotesSubscriptionPath, params))
 	if err != nil {
 		return nil, nil, err
@@ -91,7 +91,7 @@ func (w *WebsocketClient) StreamQuotes(ctx context.Context, params string) (*Con
 
 type ChanStreamOrderDepth chan models.StreamOrderDepth
 
-func (w *WebsocketClient) StreamOrderDepth(ctx context.Context, params string) (*Conn, ChanStreamOrderDepth, error) {
+func (w *Client) StreamOrderDepth(ctx context.Context, params string) (*Conn, ChanStreamOrderDepth, error) {
 	conn, err := w.Connect(fmt.Sprintf(OrderDepthSubscriptionPath, params))
 	if err != nil {
 		return nil, nil, err
@@ -124,7 +124,7 @@ func (w *WebsocketClient) StreamOrderDepth(ctx context.Context, params string) (
 
 type ChanStreamPositions chan models.StreamPositions
 
-func (w *WebsocketClient) StreamPositions(ctx context.Context, params string) (*Conn, ChanStreamPositions, error) {
+func (w *Client) StreamPositions(ctx context.Context, params string) (*Conn, ChanStreamPositions, error) {
 	conn, err := w.Connect(fmt.Sprintf(PositionsSubscriptionPath, params))
 	if err != nil {
 		return nil, nil, err
@@ -157,7 +157,7 @@ func (w *WebsocketClient) StreamPositions(ctx context.Context, params string) (*
 
 type ChanStreamOrders chan models.StreamOrders
 
-func (w *WebsocketClient) StreamOrders(ctx context.Context, params string) (*Conn, ChanStreamOrders, error) {
+func (w *Client) StreamOrders(ctx context.Context, params string) (*Conn, ChanStreamOrders, error) {
 	conn, err := w.Connect(fmt.Sprintf(OrdersSubscriptionPath, params))
 	if err != nil {
 		return nil, nil, err
@@ -190,7 +190,7 @@ func (w *WebsocketClient) StreamOrders(ctx context.Context, params string) (*Con
 
 type ChanStreamTrades chan models.StreamTrades
 
-func (w *WebsocketClient) StreamTrades(ctx context.Context, params string) (*Conn, ChanStreamTrades, error) {
+func (w *Client) StreamTrades(ctx context.Context, params string) (*Conn, ChanStreamTrades, error) {
 	conn, err := w.Connect(fmt.Sprintf(TradesSubscriptionPath, params))
 	if err != nil {
 		return nil, nil, err
