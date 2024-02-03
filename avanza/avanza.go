@@ -47,7 +47,7 @@ func New(opts ...func(a *Client)) *Client {
 		Account:   &account.AccountClient{Client: c},
 		Market:    &market.MarketClient{Client: c},
 		Order:     &order.OrderClient{Client: c},
-		Websocket: &websocket.Client{Client: c},
+		Websocket: websocket.NewClient(c),
 	}
 	for _, o := range opts {
 		o(a)
@@ -62,5 +62,12 @@ func (a *Client) Close() {
 func WithDebug(debug bool) func(a *Client) {
 	return func(a *Client) {
 		a.HTTP.SetDebug(debug)
+	}
+}
+
+func WithLogger(logger client.Logger) func(a *Client) {
+	return func(a *Client) {
+		a.HTTP.SetLogger(logger)
+		a.Client.Logger = logger
 	}
 }

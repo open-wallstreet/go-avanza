@@ -18,6 +18,7 @@ type Client struct {
 	HTTP       *resty.Client
 	encoder    *Encoder
 	AuthTokens *models.AuthSessionTokens
+	Logger     Logger
 }
 
 func New() *Client {
@@ -33,6 +34,7 @@ func New() *Client {
 	return &Client{
 		HTTP:    rClient,
 		encoder: NewEncoder(),
+		Logger:  NewNoop(),
 	}
 }
 

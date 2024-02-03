@@ -50,10 +50,12 @@ func (c *Conn) authenticate() error {
 		Ext: models.WebsocketExt{
 			SubscriptionID: c.pushSubscriptionID,
 		},
-		ID:                       c.messageCount.String(),
-		Version:                  "1.0",
-		MinimumVersion:           "1.0",
-		Channel:                  "/meta/handshake",
+		ID:             c.messageCount.String(),
+		Version:        "1.0",
+		MinimumVersion: "1.0",
+		ChannelMessage: models.ChannelMessage{
+			Channel: "/meta/handshake",
+		},
 		SupportedConnectionTypes: []string{"websocket", "long-polling", "callback-polling"},
 		Advice: models.WebsocketAdvice{
 			Timeout:  60000,
@@ -76,7 +78,9 @@ func (c *Conn) authenticate() error {
 	err = c.sendJson([]*models.ConnectMessage{{
 		ID:             c.messageCount.String(),
 		ConnectionType: "websocket",
-		Channel:        "/meta/connect",
+		ChannelMessage: models.ChannelMessage{
+			Channel: "/meta/connect",
+		},
 		Advice: models.WebsocketAdvice{
 			Timeout: 0,
 		},
@@ -106,8 +110,10 @@ func (c *Conn) ping() {
 	err := c.sendJson([]*models.ConnectMessage{{
 		ID:             c.messageCount.String(),
 		ConnectionType: "websocket",
-		Channel:        "/meta/connect",
-		ClientID:       c.clientID,
+		ChannelMessage: models.ChannelMessage{
+			Channel: "/meta/connect",
+		},
+		ClientID: c.clientID,
 	}})
 	if err != nil {
 		println("failed to ping")
@@ -117,16 +123,20 @@ func (c *Conn) ping() {
 func (c *Conn) subscribe(params string) error {
 	marshal, _ := json.Marshal(&models.SubscribeRequest{
 		Subscription: params,
-		Channel:      "/meta/subscribe",
-		ClientID:     c.clientID,
-		ID:           c.messageCount.String(),
+		ChannelMessage: models.ChannelMessage{
+			Channel: "/meta/subscribe",
+		},
+		ClientID: c.clientID,
+		ID:       c.messageCount.String(),
 	})
 	println(string(marshal))
 	msg := []*models.SubscribeRequest{{
 		Subscription: params,
-		Channel:      "/meta/subscribe",
-		ClientID:     c.clientID,
-		ID:           c.messageCount.String(),
+		ChannelMessage: models.ChannelMessage{
+			Channel: "/meta/subscribe",
+		},
+		ClientID: c.clientID,
+		ID:       c.messageCount.String(),
 	}}
 	err := c.sendJson(msg)
 	if err != nil {
